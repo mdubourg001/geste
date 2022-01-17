@@ -18,7 +18,9 @@ async function main() {
   const testFiles = walkTestFiles();
 
   await compileTestFiles(testFiles);
-  await unrollTests();
+  const duration = await unrollTests();
+
+  console.log(`Done in ${(duration / 1000).toFixed(2)}s`);
 }
 
 main().catch((error) => {

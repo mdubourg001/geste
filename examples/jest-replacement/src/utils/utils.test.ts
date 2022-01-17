@@ -6,7 +6,9 @@ test("isPair should work", async () => {
 });
 
 describe("JSON module", async () => {
-  const parsed = await Promise.resolve(JSON.parse("2"));
+  test("JSON.parse should work", async () => {
+    const parsed = await Promise.resolve(JSON.parse("2"));
 
-  expect(parsed).toBe(2);
+    expect(parsed).toBe(2);
+  });
 });

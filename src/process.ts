@@ -1,9 +1,13 @@
+import chalk from "chalk";
+import path from "path";
 import glob from "glob";
 import { build } from "esbuild";
 import Module from "module";
+import { performance } from "perf_hooks";
 
 import { PROJECT_ROOT } from "./constants";
 import { IDescribe, ITest } from "./types";
+import { log } from "./log";
 
 export function walkTestFiles() {
   return glob.sync("./**/*.test.{js,jsx,ts,tsx}", {
@@ -41,28 +45,44 @@ export async function compileTestFiles(testFiles: string[]) {
   }
 }
 
-export async function unrollTests() {
+export async function unrollTests(): Promise<number> {
   const entries = Object.entries(global.__GESTE_TESTS) as Array<
     [string, { describes: IDescribe[]; tests: ITest[] }]
   >;
 
+  const start = performance.now();
   for (const [testfile, suite] of entries) {
-    console.log(testfile);
+    const testfileRel = path.relative(PROJECT_ROOT, testfile);
+    console.log(chalk.underline(chalk.gray(testfileRel)));
 
     const describes = suite.describes ?? [];
     for (const descObj of describes) {
-      console.log(descObj.desc);
-
       for (const testObj of descObj.tests) {
-        console.log(testObj.desc);
-        await testObj.cb();
+        try {
+          await testObj.cb();
+          log.success(`${descObj.desc}: ${testObj.desc}`);
+        } catch (e) {
+          process.exitCode = 1;
+          log.fail(`${descObj.desc}: ${testObj.desc}`);
+          log.error(e);
+        }
       }
     }
 
     const tests = suite.tests ?? [];
     for (const testObj of tests) {
-      console.log(testObj.desc);
-      await testObj.cb();
+      try {
+        await testObj.cb();
+        log.success(testObj.desc);
+      } catch (e) {
+        process.exitCode = 1;
+        log.fail(testObj.desc);
+        log.error(e);
+      }
     }
+
+    console.log("\n");
   }
+
+  return performance.now() - start;
 }
