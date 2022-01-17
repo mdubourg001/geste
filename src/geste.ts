@@ -1,7 +1,7 @@
 import expect from "expect";
 
 import { getConfig } from "./config";
-import { log } from "./log";
+import { log, summarize } from "./log";
 import { describe, test } from "./test";
 import { walkTestFiles, compileTestFiles, unrollTests } from "./process";
 
@@ -18,9 +18,9 @@ async function main() {
   const testFiles = walkTestFiles();
 
   await compileTestFiles(testFiles);
-  const duration = await unrollTests();
+  const summary = await unrollTests();
 
-  console.log(`Done in ${(duration / 1000).toFixed(2)}s`);
+  summarize(summary);
 }
 
 main().catch((error) => {

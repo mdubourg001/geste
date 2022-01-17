@@ -2,7 +2,7 @@ import { isPair } from "./utils";
 
 test("isPair should work", async () => {
   expect(isPair(2)).toBe(true);
-  expect(isPair(3)).toBe(false);
+  expect(isPair(3)).toBe(true);
 });
 
 describe("JSON module", async () => {

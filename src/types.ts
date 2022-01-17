@@ -8,3 +8,11 @@ export interface IDescribe {
   cb: () => any | Promise<any>;
   tests: ITest[];
 }
+
+export interface ISummary {
+  total: number;
+  succeeded: number;
+  failed: number;
+  failedList: string[];
+  duration: number;
+}

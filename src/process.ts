@@ -6,7 +6,7 @@ import Module from "module";
 import { performance } from "perf_hooks";
 
 import { PROJECT_ROOT } from "./constants";
-import { IDescribe, ITest } from "./types";
+import { IDescribe, ISummary, ITest } from "./types";
 import { log } from "./log";
 
 export function walkTestFiles() {
@@ -45,7 +45,15 @@ export async function compileTestFiles(testFiles: string[]) {
   }
 }
 
-export async function unrollTests(): Promise<number> {
+export async function unrollTests(): Promise<ISummary> {
+  const summary = {
+    total: 0,
+    succeeded: 0,
+    failed: 0,
+    failedList: [],
+    duration: 0,
+  };
+
   const entries = Object.entries(global.__GESTE_TESTS) as Array<
     [string, { describes: IDescribe[]; tests: ITest[] }]
   >;
@@ -58,11 +66,20 @@ export async function unrollTests(): Promise<number> {
     const describes = suite.describes ?? [];
     for (const descObj of describes) {
       for (const testObj of descObj.tests) {
+        summary.total++;
+
         try {
           await testObj.cb();
           log.success(`${descObj.desc}: ${testObj.desc}`);
+
+          summary.succeeded++;
         } catch (e) {
           process.exitCode = 1;
+          summary.failed++;
+          summary.failedList.push(
+            `${descObj.desc}: ${testObj.desc} ${chalk.gray(testfileRel)}`
+          );
+
           log.fail(`${descObj.desc}: ${testObj.desc}`);
           log.error(e);
         }
@@ -71,11 +88,17 @@ export async function unrollTests(): Promise<number> {
 
     const tests = suite.tests ?? [];
     for (const testObj of tests) {
+      summary.total++;
+
       try {
         await testObj.cb();
         log.success(testObj.desc);
+        summary.succeeded++;
       } catch (e) {
         process.exitCode = 1;
+        summary.failed++;
+        summary.failedList.push(`${testObj.desc} ${chalk.gray(testfileRel)}`);
+
         log.fail(testObj.desc);
         log.error(e);
       }
@@ -83,6 +106,7 @@ export async function unrollTests(): Promise<number> {
 
     console.log("\n");
   }
+  summary.duration = performance.now() - start;
 
-  return performance.now() - start;
+  return summary;
 }
