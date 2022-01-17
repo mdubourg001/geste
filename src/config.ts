@@ -2,17 +2,19 @@ import { existsSync } from "fs";
 import { build } from "esbuild";
 import Module from "module";
 
+import { IGesteConfig } from "./types";
 import {
   CONFIG_FILE_ABS,
   CONFIG_FILE_REL,
   CONFIG_FILE_NAME,
 } from "./constants";
 
-const DEFAULT_CONFIG = {};
 let CONFIG;
+const DEFAULT_CONFIG: IGesteConfig = {
+  testPattern: ["./**/*.test.{js,jsx,ts,tsx}"],
+};
 
-// TODO: Merge config object with default config
-export async function getConfig() {
+export async function getConfig(): Promise<IGesteConfig> {
   if (CONFIG) {
     return CONFIG;
   } else if (!existsSync(CONFIG_FILE_ABS)) {
@@ -43,14 +45,14 @@ export async function getConfig() {
   }
 
   if (typeof module.exports?.default === "object") {
-    CONFIG = module.exports.default;
-    return CONFIG;
+    CONFIG = { ...DEFAULT_CONFIG, ...module.exports.default };
   } else if (typeof module.exports?.default === "function") {
-    CONFIG = module.exports.default();
-    return CONFIG;
+    CONFIG = { ...DEFAULT_CONFIG, ...module.exports.default() };
   } else {
     throwConfigDiagnosis();
   }
+
+  return CONFIG;
 }
 
 function throwConfigDiagnosis() {

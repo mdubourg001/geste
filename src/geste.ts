@@ -15,7 +15,7 @@ global.expect = expect;
 
 async function main() {
   const config = await getConfig();
-  const testFiles = walkTestFiles();
+  const testFiles = walkTestFiles(config.testPattern);
 
   await compileTestFiles(testFiles);
   const summary = await unrollTests();

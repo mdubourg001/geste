@@ -1,3 +1,7 @@
+export interface IGesteConfig {
+  testPattern: string[];
+}
+
 export interface ITest {
   desc: string;
   cb: () => any | Promise<any>;

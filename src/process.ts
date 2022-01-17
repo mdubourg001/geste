@@ -9,11 +9,13 @@ import { PROJECT_ROOT } from "./constants";
 import { IDescribe, ISummary, ITest } from "./types";
 import { log } from "./log";
 
-export function walkTestFiles() {
-  return glob.sync("./**/*.test.{js,jsx,ts,tsx}", {
-    cwd: PROJECT_ROOT,
-    absolute: true,
-  });
+export function walkTestFiles(patterns: string[]) {
+  return patterns.flatMap((pattern) =>
+    glob.sync(pattern, {
+      cwd: PROJECT_ROOT,
+      absolute: true,
+    })
+  );
 }
 
 export async function compileTestFiles(testFiles: string[]) {
