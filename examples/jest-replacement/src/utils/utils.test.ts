@@ -1,0 +1,12 @@
+import { isPair } from "./utils";
+
+test("isPair should work", async () => {
+  expect(isPair(2)).toBe(true);
+  expect(isPair(3)).toBe(false);
+});
+
+describe("JSON module", async () => {
+  const parsed = await Promise.resolve(JSON.parse("2"));
+
+  expect(parsed).toBe(2);
+});

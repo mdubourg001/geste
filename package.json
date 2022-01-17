@@ -1,0 +1,28 @@
+{
+  "name": "geste",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/geste.js",
+  "bin": {
+    "geste": "./dist/geste.js"
+  },
+  "scripts": {
+    "build": "esbuild src/geste.ts --outfile=dist/geste.js --external:esbuild --loader:.ts=tsx --platform=node --format=cjs --bundle",
+    "start": "pnpm build && pnpm node dist/geste.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "17.0.9"
+  },
+  "dependencies": {
+    "chalk": "^5.0.0",
+    "esbuild": "0.14.11",
+    "expect": "^27.4.6",
+    "glob": "^7.2.0",
+    "pkg-up": "4.0.0"
+  },
+  "peerDependencies": {
+    "esbuild": "*"
+  }
+}

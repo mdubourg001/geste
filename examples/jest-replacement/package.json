@@ -1,0 +1,11 @@
+{
+  "name": "jest-replacement",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "test": "cd ../.. && pnpm build && cd examples/jest-replacement && geste"
+  }
+}
