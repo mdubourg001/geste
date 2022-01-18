@@ -1,14 +1,12 @@
 {
   "name": "geste-test",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "",
-  "main": "dist/geste.js",
   "bin": {
     "geste": "./dist/geste.js"
   },
   "files": [
-    "./dist/dom.js",
-    "./dist/geste.js",
+    "dist/**/*",
     "index.d.ts"
   ],
   "scripts": {
