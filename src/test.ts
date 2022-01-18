@@ -1,3 +1,5 @@
+import util from "util";
+
 import { IDescribe, ITest } from "./types";
 
 export async function describe(desc: string, cb: () => any | Promise<any>) {
@@ -50,6 +52,16 @@ export async function test(desc: string, cb: () => any | Promise<any>) {
     };
   }
 }
+
+test.each = function (cases: any[]) {
+  return async (desc: string, cb: (...args: any[]) => any | Promise<any>) => {
+    for (const eachCase of cases) {
+      const formattedDesc = util.format(desc, ...eachCase);
+
+      test(formattedDesc, () => cb(...eachCase));
+    }
+  };
+};
 
 export async function beforeAll(cb: () => any | Promise<any>) {
   const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];

@@ -25,7 +25,6 @@ global.afterAll = afterAll;
 global.beforeEach = beforeEach;
 global.afterEach = afterEach;
 
-// TODO: test.each
 // TODO: using tsconfig.json if present
 // TODO: mock
 async function main() {
