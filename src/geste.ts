@@ -3,6 +3,8 @@ import expect from "expect";
 import { getConfig } from "./config";
 import { log, summarize } from "./log";
 import { walkTestFiles, compileTestFiles, unrollTests } from "./process";
+import { parseCmdlineArgs } from "./args";
+import { CWD, PROJECT_ROOT } from "./constants";
 import {
   describe,
   test,
@@ -25,12 +27,19 @@ global.afterAll = afterAll;
 global.beforeEach = beforeEach;
 global.afterEach = afterEach;
 
-// TODO: run on a single test files / glob pattern
 // TODO: using tsconfig.json if present
 // TODO: mock
 async function main() {
+  const parsedArgv = parseCmdlineArgs(process.argv);
   const config = await getConfig();
-  const testFiles = walkTestFiles(config);
+
+  const testFiles = walkTestFiles({
+    ignoreRegexps: config.ignoreRegexps,
+    testPatterns: parsedArgv.testPatterns.length
+      ? parsedArgv.testPatterns
+      : config.testPatterns,
+    cwd: parsedArgv.testPatterns.length ? CWD : PROJECT_ROOT,
+  });
 
   await compileTestFiles(testFiles);
   const summary = await unrollTests(config.setupFiles);

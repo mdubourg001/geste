@@ -4,7 +4,7 @@ import glob from "glob";
 import Module from "module";
 import { performance } from "perf_hooks";
 
-import { PROJECT_ROOT } from "./constants";
+import { PROJECT_ROOT, CWD } from "./constants";
 import { IDescribe, ISummary, ITest, ILifecycleHookCb } from "./types";
 import { log } from "./log";
 import { bundleForNode } from "./bundle";
@@ -12,17 +12,20 @@ import { bundleForNode } from "./bundle";
 export function walkTestFiles({
   testPatterns,
   ignoreRegexps,
+  cwd,
 }: {
   testPatterns: string[];
   ignoreRegexps: string[];
+  cwd: string;
 }): string[] {
   return testPatterns
-    .flatMap((pattern) =>
-      glob.sync(pattern, {
-        cwd: PROJECT_ROOT,
+    .flatMap((pattern) => {
+      return glob.sync(pattern, {
+        cwd,
+        nodir: true,
         absolute: true,
-      })
-    )
+      });
+    })
     .filter((file) => {
       return !ignoreRegexps.some((pattern) => new RegExp(pattern).test(file));
     });
