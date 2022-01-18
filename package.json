@@ -11,7 +11,7 @@
     "index.d.ts"
   ],
   "scripts": {
-    "build:test-runner": "esbuild src/geste.ts --outfile=dist/geste.js --external:esbuild --loader:.ts=tsx --platform=node --format=cjs --bundle",
+    "build:test-runner": "esbuild src/geste.ts --outfile=dist/geste.js --external:esbuild --loader:.ts=tsx --platform=node --format=cjs --banner:js=\"#!/usr/bin/env node\" --bundle",
     "build:dom": "esbuild src/dom.ts --outfile=dist/dom.js --loader:.ts=tsx --platform=node --format=cjs --bundle",
     "build": "pnpm build:test-runner && pnpm build:dom",
     "start": "pnpm build && pnpm node dist/geste.js",
