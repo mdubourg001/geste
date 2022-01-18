@@ -9,13 +9,23 @@ import { IDescribe, ISummary, ITest, ILifecycleHookCb } from "./types";
 import { log } from "./log";
 import { bundleForNode } from "./bundle";
 
-export function walkTestFiles(patterns: string[]) {
-  return patterns.flatMap((pattern) =>
-    glob.sync(pattern, {
-      cwd: PROJECT_ROOT,
-      absolute: true,
-    })
-  );
+export function walkTestFiles({
+  testPatterns,
+  ignoreRegexps,
+}: {
+  testPatterns: string[];
+  ignoreRegexps: string[];
+}): string[] {
+  return testPatterns
+    .flatMap((pattern) =>
+      glob.sync(pattern, {
+        cwd: PROJECT_ROOT,
+        absolute: true,
+      })
+    )
+    .filter((file) => {
+      return !ignoreRegexps.some((pattern) => new RegExp(pattern).test(file));
+    });
 }
 
 export async function compileTestFiles(testFiles: string[]) {

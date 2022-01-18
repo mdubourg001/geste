@@ -25,11 +25,12 @@ global.afterAll = afterAll;
 global.beforeEach = beforeEach;
 global.afterEach = afterEach;
 
+// TODO: run on a single test files / glob pattern
 // TODO: using tsconfig.json if present
 // TODO: mock
 async function main() {
   const config = await getConfig();
-  const testFiles = walkTestFiles(config.testPatterns);
+  const testFiles = walkTestFiles(config);
 
   await compileTestFiles(testFiles);
   const summary = await unrollTests(config.setupFiles);

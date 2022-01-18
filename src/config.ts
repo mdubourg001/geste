@@ -11,7 +11,11 @@ import {
 
 let CONFIG;
 const DEFAULT_CONFIG: IGesteConfig = {
-  testPatterns: ["./**/*.test.{js,jsx,ts,tsx}"],
+  testPatterns: [
+    "**/__tests__/**/*.[jt]s?(x)",
+    "**/?(*.)+(spec|test).[jt]s?(x)",
+  ],
+  ignoreRegexps: ["/node_modules/"],
   setupFiles: [],
 };
 

@@ -1,6 +1,8 @@
 export interface IGesteConfig {
   // an array of glob patterns used to find test files in the project
   testPatterns: string[];
+  // an array of regexps on which resolved files are matched before running
+  ignoreRegexps: string[];
   // the list of files to run before running each tests
   setupFiles: string[];
 }
