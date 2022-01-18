@@ -1,6 +1,6 @@
 {
-  "name": "geste",
-  "version": "1.0.0",
+  "name": "geste-test",
+  "version": "0.1.1",
   "description": "",
   "main": "dist/geste.js",
   "bin": {
@@ -10,12 +10,14 @@
     "build:test-runner": "esbuild src/geste.ts --outfile=dist/geste.js --external:esbuild --loader:.ts=tsx --platform=node --format=cjs --bundle",
     "build:dom": "esbuild src/dom.ts --outfile=dist/dom.js --loader:.ts=tsx --platform=node --format=cjs --bundle",
     "build": "pnpm build:test-runner && pnpm build:dom",
-    "start": "pnpm build && pnpm node dist/geste.js"
+    "start": "pnpm build && pnpm node dist/geste.js",
+    "test": "pnpm build && cd examples/jest-replacement && pnpm geste"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "17.0.9"
+    "@types/node": "17.0.9",
+    "np": "^7.6.0"
   },
   "dependencies": {
     "chalk": "^5.0.0",
