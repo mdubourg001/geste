@@ -37,11 +37,13 @@ export async function bundleForNode({
   const bundle = await build({
     entryPoints: files,
     write: false,
+    allowOverwrite: true,
     bundle: true,
     outbase: ".",
     outdir: ".",
     logLevel: "silent",
     platform: "node",
+    target: "node12",
     format: "cjs",
     loader: { ".js": "jsx", ".ts": "tsx" },
   });

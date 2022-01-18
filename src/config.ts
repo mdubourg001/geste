@@ -26,10 +26,12 @@ export async function getConfig(): Promise<IGesteConfig> {
   const bundle = await build({
     entryPoints: [CONFIG_FILE_ABS],
     write: false,
+    allowOverwrite: true,
     outbase: ".",
     outdir: ".",
     logLevel: "silent",
     platform: "node",
+    target: "node12",
     format: "cjs",
     loader: { ".ts": "tsx" },
   });
