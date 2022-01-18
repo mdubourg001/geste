@@ -50,3 +50,59 @@ export async function test(desc: string, cb: () => any | Promise<any>) {
     };
   }
 }
+
+export async function beforeAll(cb: () => any | Promise<any>) {
+  const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
+
+  if (currentTestfile?.beforeAllCbs) {
+    currentTestfile.beforeAllCbs.push(cb);
+  } else if (currentTestfile) {
+    currentTestfile.beforeAllCbs = [cb];
+  } else {
+    global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
+      beforeAllCbs: [cb],
+    };
+  }
+}
+
+export async function afterAll(cb: () => any | Promise<any>) {
+  const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
+
+  if (currentTestfile?.afterAllCbs) {
+    currentTestfile.afterAllCbs.push(cb);
+  } else if (currentTestfile) {
+    currentTestfile.afterAllCbs = [cb];
+  } else {
+    global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
+      afterAllCbs: [cb],
+    };
+  }
+}
+
+export async function beforeEach(cb: () => any | Promise<any>) {
+  const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
+
+  if (currentTestfile?.beforeEachCbs) {
+    currentTestfile.beforeEachCbs.push(cb);
+  } else if (currentTestfile) {
+    currentTestfile.beforeEachCbs = [cb];
+  } else {
+    global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
+      beforeEachCbs: [cb],
+    };
+  }
+}
+
+export async function afterEach(cb: () => any | Promise<any>) {
+  const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
+
+  if (currentTestfile?.afterEachCbs) {
+    currentTestfile.afterEachCbs.push(cb);
+  } else if (currentTestfile) {
+    currentTestfile.afterEachCbs = [cb];
+  } else {
+    global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
+      afterEachCbs: [cb],
+    };
+  }
+}

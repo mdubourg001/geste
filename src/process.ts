@@ -5,7 +5,7 @@ import Module from "module";
 import { performance } from "perf_hooks";
 
 import { PROJECT_ROOT } from "./constants";
-import { IDescribe, ISummary, ITest } from "./types";
+import { IDescribe, ISummary, ITest, ILifecycleHookCb } from "./types";
 import { log } from "./log";
 import { bundleForNode } from "./bundle";
 
@@ -64,12 +64,26 @@ export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
   };
 
   const entries = Object.entries(global.__GESTE_TESTS) as Array<
-    [string, { describes: IDescribe[]; tests: ITest[] }]
+    [
+      string,
+      {
+        describes: IDescribe[];
+        tests: ITest[];
+        beforeAllCbs: ILifecycleHookCb[];
+        afterAllCbs: ILifecycleHookCb[];
+        beforeEachCbs: ILifecycleHookCb[];
+        afterEachCbs: ILifecycleHookCb[];
+      }
+    ]
   >;
 
   const start = performance.now();
   for (const [testfile, suite] of entries) {
     await compileSetupFiles(setupFiles);
+
+    for (const beforeAllCb of suite.beforeAllCbs ?? []) {
+      await beforeAllCb();
+    }
 
     const testfileRel = path.relative(PROJECT_ROOT, testfile);
     console.log(chalk.underline(chalk.gray(testfileRel)));
@@ -78,6 +92,10 @@ export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
     for (const descObj of describes) {
       for (const testObj of descObj.tests) {
         summary.total++;
+
+        for (const beforeEachCb of suite.beforeEachCbs ?? []) {
+          await beforeEachCb();
+        }
 
         try {
           await testObj.cb();
@@ -94,12 +112,20 @@ export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
           log.fail(`${descObj.desc}: ${testObj.desc}`);
           log.error(e);
         }
+
+        for (const afterEachCb of suite.afterEachCbs ?? []) {
+          await afterEachCb();
+        }
       }
     }
 
     const tests = suite.tests ?? [];
     for (const testObj of tests) {
       summary.total++;
+
+      for (const beforeEachCb of suite.beforeEachCbs ?? []) {
+        await beforeEachCb();
+      }
 
       try {
         await testObj.cb();
@@ -113,6 +139,14 @@ export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
         log.fail(testObj.desc);
         log.error(e);
       }
+
+      for (const afterEachCb of suite.afterEachCbs ?? []) {
+        await afterEachCb();
+      }
+    }
+
+    for (const afterAllCb of suite.afterAllCbs ?? []) {
+      await afterAllCb();
     }
 
     console.log("\n");

@@ -16,6 +16,8 @@ export interface IDescribe {
   tests: ITest[];
 }
 
+export type ILifecycleHookCb = () => any | Promise<any>;
+
 export interface ISummary {
   total: number;
   succeeded: number;
