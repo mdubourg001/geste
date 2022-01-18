@@ -13,12 +13,16 @@ global.describe = describe;
 global.test = test;
 global.expect = expect;
 
+// TODO: setupFiles in config
+// TODO: beforeEach, beforeAll, afterEach, afterAll
+// TODO: using tsconfig.json if present
+// TODO: mock
 async function main() {
   const config = await getConfig();
-  const testFiles = walkTestFiles(config.testPattern);
+  const testFiles = walkTestFiles(config.testPatterns);
 
   await compileTestFiles(testFiles);
-  const summary = await unrollTests();
+  const summary = await unrollTests(config.setupFiles);
 
   summarize(summary);
 }

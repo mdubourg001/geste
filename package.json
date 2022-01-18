@@ -7,7 +7,9 @@
     "geste": "./dist/geste.js"
   },
   "scripts": {
-    "build": "esbuild src/geste.ts --outfile=dist/geste.js --external:esbuild --loader:.ts=tsx --platform=node --format=cjs --bundle",
+    "build:test-runner": "esbuild src/geste.ts --outfile=dist/geste.js --external:esbuild --loader:.ts=tsx --platform=node --format=cjs --bundle",
+    "build:dom": "esbuild src/dom.ts --outfile=dist/dom.js --loader:.ts=tsx --platform=node --format=cjs --bundle",
+    "build": "pnpm build:test-runner && pnpm build:dom",
     "start": "pnpm build && pnpm node dist/geste.js"
   },
   "author": "",
@@ -20,6 +22,7 @@
     "esbuild": "0.14.11",
     "expect": "^27.4.6",
     "glob": "^7.2.0",
+    "linkedom": "^0.13.0",
     "pkg-up": "4.0.0"
   },
   "peerDependencies": {

@@ -1,13 +1,13 @@
 import chalk from "chalk";
 import path from "path";
 import glob from "glob";
-import { build } from "esbuild";
 import Module from "module";
 import { performance } from "perf_hooks";
 
 import { PROJECT_ROOT } from "./constants";
 import { IDescribe, ISummary, ITest } from "./types";
 import { log } from "./log";
+import { bundleForNode } from "./bundle";
 
 export function walkTestFiles(patterns: string[]) {
   return patterns.flatMap((pattern) =>
@@ -19,17 +19,7 @@ export function walkTestFiles(patterns: string[]) {
 }
 
 export async function compileTestFiles(testFiles: string[]) {
-  const bundle = await build({
-    entryPoints: testFiles,
-    write: false,
-    bundle: true,
-    outbase: ".",
-    outdir: ".",
-    logLevel: "silent",
-    platform: "node",
-    format: "cjs",
-    loader: { ".js": "jsx", ".ts": "tsx" },
-  });
+  const bundle = await bundleForNode({ files: testFiles });
 
   for (const file of bundle.outputFiles) {
     global.__GESTE_CURRENT_TESTFILE = file.path;
@@ -47,7 +37,24 @@ export async function compileTestFiles(testFiles: string[]) {
   }
 }
 
-export async function unrollTests(): Promise<ISummary> {
+export async function compileSetupFiles(setupFiles: string[]) {
+  const bundle = await bundleForNode({ files: setupFiles, memoize: true });
+
+  for (const file of bundle.outputFiles) {
+    const moduleSources = file.text;
+    const module = new Module(file.path);
+
+    try {
+      // @ts-ignore
+      module._compile(moduleSources, "");
+    } catch (e) {
+      // TODO: throw
+      console.error(e.stack);
+    }
+  }
+}
+
+export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
   const summary = {
     total: 0,
     succeeded: 0,
@@ -62,6 +69,8 @@ export async function unrollTests(): Promise<ISummary> {
 
   const start = performance.now();
   for (const [testfile, suite] of entries) {
+    await compileSetupFiles(setupFiles);
+
     const testfileRel = path.relative(PROJECT_ROOT, testfile);
     console.log(chalk.underline(chalk.gray(testfileRel)));
 

@@ -1,5 +1,8 @@
 export interface IGesteConfig {
-  testPattern: string[];
+  // an array of glob patterns used to find test files in the project
+  testPatterns: string[];
+  // the list of files to run before running each tests
+  setupFiles: string[];
 }
 
 export interface ITest {

@@ -11,7 +11,8 @@ import {
 
 let CONFIG;
 const DEFAULT_CONFIG: IGesteConfig = {
-  testPattern: ["./**/*.test.{js,jsx,ts,tsx}"],
+  testPatterns: ["./**/*.test.{js,jsx,ts,tsx}"],
+  setupFiles: [],
 };
 
 export async function getConfig(): Promise<IGesteConfig> {
