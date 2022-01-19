@@ -29,6 +29,7 @@ npm install geste-test
 
 - [`describe`](https://jestjs.io/docs/api#describename-fn)
 - [`test`](https://jestjs.io/docs/api#testname-fn-timeout)
+- [`test.each`](https://jestjs.io/docs/api#testeachtablename-fn-timeout)
 - [`it`](https://jestjs.io/docs/api#testname-fn-timeout)
 - [`beforeAll`](https://jestjs.io/docs/api#beforeallfn-timeout)
 - [`afterAll`](https://jestjs.io/docs/api#afterallfn-timeout)
