@@ -8,7 +8,7 @@ import { PROJECT_ROOT, CWD } from "./constants";
 import { IDescribe, ISummary, ITest, ILifecycleHookCb } from "./types";
 import { log } from "./log";
 import { bundleForNode } from "./bundle";
-import { getFormattedDuration } from "./utils";
+import { getFormattedDuration, getPathWithoutExt } from "./utils";
 
 export function walkTestFiles({
   testPatterns,
@@ -49,7 +49,11 @@ export async function compileTestFiles(testFiles: string[]) {
   const bundle = await bundleForNode({ files: testFiles });
 
   for (const file of bundle.outputFiles) {
-    global.__GESTE_CURRENT_TESTFILE = file.path;
+    const withoutExt = getPathWithoutExt(file.path);
+    const sourceFile = testFiles.find(
+      (f) => getPathWithoutExt(f) === withoutExt
+    );
+    global.__GESTE_CURRENT_TESTFILE = sourceFile;
 
     const moduleSources = file.text;
     const module = new Module(file.path);

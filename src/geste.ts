@@ -27,8 +27,6 @@ global.afterAll = afterAll;
 global.beforeEach = beforeEach;
 global.afterEach = afterEach;
 
-// TODO: Log each step (walking, compiling, running...) with its duration
-// TODO: using tsconfig.json if present
 // TODO: mock
 async function main() {
   const parsedArgv = parseCmdlineArgs(process.argv);
