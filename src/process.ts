@@ -12,27 +12,24 @@ import { getFormattedDuration, getPathWithoutExt } from "./utils";
 
 export function walkTestFiles({
   testPatterns,
-  ignoreRegexps,
+  ignorePatterns,
   cwd,
 }: {
   testPatterns: string[];
-  ignoreRegexps: string[];
+  ignorePatterns: string[];
   cwd: string;
 }): string[] {
   process.stdout.write("\n →  Identifying test files to run...");
   const start = performance.now();
 
-  const files = testPatterns
-    .flatMap((pattern) => {
-      return glob.sync(pattern, {
-        cwd,
-        nodir: true,
-        absolute: true,
-      });
-    })
-    .filter((file) => {
-      return !ignoreRegexps.some((pattern) => new RegExp(pattern).test(file));
+  const files = testPatterns.flatMap((pattern) => {
+    return glob.sync(pattern, {
+      cwd,
+      nodir: true,
+      absolute: true,
+      ignore: ignorePatterns,
     });
+  });
 
   const duration = getFormattedDuration(performance.now() - start);
   process.stdout.write(

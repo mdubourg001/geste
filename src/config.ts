@@ -15,7 +15,7 @@ const DEFAULT_CONFIG: IGesteConfig = {
     "**/__tests__/**/*.[jt]s?(x)",
     "**/?(*.)+(spec|test).[jt]s?(x)",
   ],
-  ignoreRegexps: ["/node_modules/"],
+  ignorePatterns: ["./node_modules/**/*"],
   setupFiles: [],
 };
 

@@ -33,7 +33,7 @@ async function main() {
   const config = await getConfig();
 
   const testFiles = walkTestFiles({
-    ignoreRegexps: config.ignoreRegexps,
+    ignorePatterns: config.ignorePatterns,
     testPatterns: parsedArgv.testPatterns.length
       ? parsedArgv.testPatterns
       : config.testPatterns,

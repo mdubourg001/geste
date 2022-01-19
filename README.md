@@ -88,7 +88,7 @@ export default {
     "**/__tests__/**/*.[jt]s?(x)",
     "**/?(*.)+(spec|test).[jt]s?(x)",
   ],
-  ignoreRegexps: ["/node_modules/"],
+  ignorePatterns: ["/node_modules/"],
   setupFiles: [],
 };
 ```
@@ -96,5 +96,5 @@ export default {
 Here are the list of the currently supported configuration options, and their Jest's "equivalent":
 
 - `testPatterns`: array of [glob](https://github.com/isaacs/node-glob) patterns used to walk your project's sources and find test files. Equivalent to [Jest's `testMatch`](https://jestjs.io/docs/configuration#testmatch-arraystring)
-- `ignoreRegexps`: array of regexp patterns on which found test files will be matched against. Files matching one of these patterns will be ignored. Equivalent to [Jest's `testPathIgnorePatterns`](https://jestjs.io/docs/configuration#testpathignorepatterns-arraystring)
+- `ignorePatterns`: array of [glob](https://github.com/isaacs/node-glob) patterns that will be ignored when looking for test files. Close to [Jest's `testPathIgnorePatterns`](https://jestjs.io/docs/configuration#testpathignorepatterns-arraystring) but here **it's a array of glob patterns instead of regexp patterns**.
 - `setupFiles`: array of paths to modules that will be compiled and evaluated before every one of your test files. Equivalent to [Jest's `setupFiles`](https://jestjs.io/docs/configuration#setupfiles-array)
