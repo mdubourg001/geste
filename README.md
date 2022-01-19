@@ -88,7 +88,7 @@ export default {
     "**/__tests__/**/*.[jt]s?(x)",
     "**/?(*.)+(spec|test).[jt]s?(x)",
   ],
-  ignorePatterns: ["/node_modules/"],
+  ignorePatterns: ["**/node_modules/**/*"],
   setupFiles: [],
 };
 ```
