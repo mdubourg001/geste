@@ -1,6 +1,7 @@
 import chalk from "chalk";
 
 import { ISummary } from "./types";
+import { getFormattedDuration } from "./utils";
 
 export const log = {
   error: function (error: string | Error) {
@@ -25,7 +26,7 @@ export const log = {
 
 export function summarize(summary: ISummary) {
   console.log(`Total:     ${summary.total}
-Duration:  ${(summary.duration / 1000).toFixed(2)}s
+Duration:  ${getFormattedDuration(summary.duration)}
 ${chalk.green(`Passed:    ${summary.succeeded}`)}
 ${chalk.red(`Failed:    ${summary.failed}`)}`);
 

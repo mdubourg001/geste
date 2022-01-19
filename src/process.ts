@@ -8,6 +8,7 @@ import { PROJECT_ROOT, CWD } from "./constants";
 import { IDescribe, ISummary, ITest, ILifecycleHookCb } from "./types";
 import { log } from "./log";
 import { bundleForNode } from "./bundle";
+import { getFormattedDuration } from "./utils";
 
 export function walkTestFiles({
   testPatterns,
@@ -18,7 +19,10 @@ export function walkTestFiles({
   ignoreRegexps: string[];
   cwd: string;
 }): string[] {
-  return testPatterns
+  process.stdout.write("\n →  Identifying test files to run...");
+  const start = performance.now();
+
+  const files = testPatterns
     .flatMap((pattern) => {
       return glob.sync(pattern, {
         cwd,
@@ -29,9 +33,19 @@ export function walkTestFiles({
     .filter((file) => {
       return !ignoreRegexps.some((pattern) => new RegExp(pattern).test(file));
     });
+
+  const duration = getFormattedDuration(performance.now() - start);
+  process.stdout.write(
+    `\r →  Identified test files to run. ${chalk.gray(duration)}\n`
+  );
+
+  return files;
 }
 
 export async function compileTestFiles(testFiles: string[]) {
+  process.stdout.write(" →  Compiling test files...");
+  const start = performance.now();
+
   const bundle = await bundleForNode({ files: testFiles });
 
   for (const file of bundle.outputFiles) {
@@ -48,6 +62,9 @@ export async function compileTestFiles(testFiles: string[]) {
       console.error(e.stack);
     }
   }
+
+  const duration = getFormattedDuration(performance.now() - start);
+  process.stdout.write(`\r →  Compiled test files. ${chalk.gray(duration)}\n`);
 }
 
 export async function compileSetupFiles(setupFiles: string[]) {
@@ -68,6 +85,8 @@ export async function compileSetupFiles(setupFiles: string[]) {
 }
 
 export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
+  process.stdout.write(" →  Running tests...\n\n");
+
   const summary = {
     total: 0,
     succeeded: 0,
