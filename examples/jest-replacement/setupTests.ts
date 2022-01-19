@@ -1,1 +1,1 @@
-import "geste/dist/dom";
+import "geste/dom";

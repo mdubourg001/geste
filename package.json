@@ -5,6 +5,12 @@
   "bin": {
     "geste": "./dist/geste.js"
   },
+  "exports": {
+    "./dom": {
+      "require": "./dist/dom.js",
+      "import": "./dist/dom.js"
+    }
+  },
   "files": [
     "dist/**/*",
     "index.d.ts"
