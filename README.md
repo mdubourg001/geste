@@ -20,7 +20,7 @@
 ## Installation
 
 ```bash
-npm install geste-test
+npm install --save-dev geste-test
 ```
 
 ## API
@@ -54,6 +54,12 @@ geste tests/utils/*.ts
 
 ### Usage with tests needing a DOM
 
+Install jsdom and global-jsdom:
+
+```bash
+npm install --save-dev jsdom global-jsdom
+```
+
 Create a `geste.config.ts` file at the root of your project (next to `package.json`):
 
 ```ts
@@ -69,7 +75,7 @@ Then create the `setupTests.ts` file, which will be ran before **each one of you
 ```ts
 // setupTests.ts
 
-import "geste/dom";
+import "global-jsdom/register";
 ```
 
 ## Configuration

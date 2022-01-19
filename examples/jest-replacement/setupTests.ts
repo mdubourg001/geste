@@ -1,1 +1,1 @@
-import "geste/dom";
+import "global-jsdom/register";

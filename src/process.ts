@@ -69,10 +69,19 @@ export async function compileTestFiles(testFiles: string[]) {
 }
 
 export async function compileSetupFiles(setupFiles: string[]) {
-  const bundle = await bundleForNode({ files: setupFiles, memoize: true });
+  const bundle = await bundleForNode({
+    files: setupFiles,
+    memoize: true,
+    // hack to monkey patch https://github.com/evanw/esbuild/issues/1311
+    buildOptions: { external: ["canvas"] },
+  });
 
   for (const file of bundle.outputFiles) {
-    const moduleSources = file.text;
+    // hack to monkey patch https://github.com/evanw/esbuild/issues/1311
+    const moduleSources = file.text.replace(
+      /\.\/xhr-sync-worker.js/g,
+      "jsdom/lib/jsdom/living/xhr/xhr-sync-worker"
+    );
     const module = new Module(file.path);
 
     try {

@@ -1,4 +1,4 @@
-import { build } from "esbuild";
+import { build, BuildOptions } from "esbuild";
 
 const BUNDLE_CACHE = {};
 
@@ -24,9 +24,11 @@ function arrayHash(arr: string[]) {
 export async function bundleForNode({
   files,
   memoize = false,
+  buildOptions = {},
 }: {
   files: string[];
   memoize?: boolean;
+  buildOptions?: BuildOptions;
 }) {
   const filesHash = arrayHash(files);
 
@@ -46,6 +48,7 @@ export async function bundleForNode({
     target: "node12",
     format: "cjs",
     loader: { ".js": "jsx", ".ts": "tsx", ".png": "dataurl" },
+    ...buildOptions,
   });
 
   if (memoize) {

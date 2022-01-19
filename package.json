@@ -5,20 +5,12 @@
   "bin": {
     "geste": "./dist/geste.js"
   },
-  "exports": {
-    "./dom": {
-      "require": "./dist/dom.js",
-      "import": "./dist/dom.js"
-    }
-  },
   "files": [
     "dist/**/*",
     "index.d.ts"
   ],
   "scripts": {
-    "build:test-runner": "esbuild src/geste.ts --outfile=dist/geste.js --external:esbuild --loader:.ts=tsx --platform=node --target=node12 --format=cjs --banner:js=\"#!/usr/bin/env node\" --bundle",
-    "build:dom": "esbuild src/dom.ts --outfile=dist/dom.js --loader:.ts=tsx --platform=node --target=node12 --format=cjs --bundle",
-    "build": "pnpm build:test-runner && pnpm build:dom",
+    "build": "esbuild src/geste.ts --outfile=dist/geste.js --external:esbuild --loader:.ts=tsx --platform=node --target=node12 --format=cjs --banner:js=\"#!/usr/bin/env node\" --bundle",
     "test": "pnpm build && cd examples/jest-replacement && pnpm geste",
     "prepublish": "pnpm build"
   },
@@ -26,6 +18,8 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "17.0.9",
+    "global-jsdom": "^8.4.0",
+    "jsdom": "^19.0.0",
     "np": "^7.6.0"
   },
   "dependencies": {
@@ -33,7 +27,6 @@
     "esbuild": "0.14.11",
     "expect": "^27.4.6",
     "glob": "^7.2.0",
-    "linkedom": "^0.13.0",
     "pkg-up": "4.0.0"
   },
   "peerDependencies": {
