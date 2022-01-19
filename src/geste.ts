@@ -27,6 +27,7 @@ global.afterAll = afterAll;
 global.beforeEach = beforeEach;
 global.afterEach = afterEach;
 
+// TODO: Log each step (walking, compiling, running...) with its duration
 // TODO: using tsconfig.json if present
 // TODO: mock
 async function main() {
@@ -38,6 +39,7 @@ async function main() {
     testPatterns: parsedArgv.testPatterns.length
       ? parsedArgv.testPatterns
       : config.testPatterns,
+    // if testPatterns are given from command line, searching these patterns from cwd
     cwd: parsedArgv.testPatterns.length ? CWD : PROJECT_ROOT,
   });
 

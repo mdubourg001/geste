@@ -45,7 +45,7 @@ export async function bundleForNode({
     platform: "node",
     target: "node12",
     format: "cjs",
-    loader: { ".js": "jsx", ".ts": "tsx" },
+    loader: { ".js": "jsx", ".ts": "tsx", ".png": "dataurl" },
   });
 
   if (memoize) {
