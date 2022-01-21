@@ -47,8 +47,7 @@ export async function getConfig(): Promise<IGesteConfig> {
     // @ts-ignore
     module._compile(moduleSources, "");
   } catch (error) {
-    // TODO: throw
-    console.error(error.stack);
+    throw error.stack;
   }
 
   if (typeof module.exports?.default === "object") {

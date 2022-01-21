@@ -4,7 +4,7 @@ import glob from "glob";
 import Module from "module";
 import { performance } from "perf_hooks";
 
-import { PROJECT_ROOT, CWD } from "./constants";
+import { PROJECT_ROOT } from "./constants";
 import { IDescribe, ISummary, ITest, ILifecycleHookCb } from "./types";
 import { log } from "./log";
 import { bundleForNode } from "./bundle";
@@ -59,8 +59,11 @@ export async function compileTestFiles(testFiles: string[]) {
       // @ts-ignore
       module._compile(moduleSources, "");
     } catch (e) {
-      // TODO: throw
-      console.error(e.stack);
+      throw new Error(
+        `Error while compiling ${path.relative(PROJECT_ROOT, sourceFile)}:\n${
+          e.stack
+        };`
+      );
     }
   }
 
@@ -72,24 +75,22 @@ export async function compileSetupFiles(setupFiles: string[]) {
   const bundle = await bundleForNode({
     files: setupFiles,
     memoize: true,
-    // hack to monkey patch https://github.com/evanw/esbuild/issues/1311
-    buildOptions: { external: ["canvas"] },
   });
 
   for (const file of bundle.outputFiles) {
     // hack to monkey patch https://github.com/evanw/esbuild/issues/1311
-    const moduleSources = file.text.replace(
-      /\.\/xhr-sync-worker.js/g,
-      "jsdom/lib/jsdom/living/xhr/xhr-sync-worker"
-    );
+    const moduleSources = file.text;
     const module = new Module(file.path);
 
     try {
       // @ts-ignore
       module._compile(moduleSources, "");
     } catch (e) {
-      // TODO: throw
-      console.error(e.stack);
+      throw new Error(
+        `Error while compiling ${path.relative(PROJECT_ROOT, file.path)}:\n${
+          e.stack
+        };`
+      );
     }
   }
 }
@@ -121,14 +122,14 @@ export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
 
   const start = performance.now();
   for (const [testfile, suite] of entries) {
+    const testfileRel = path.relative(PROJECT_ROOT, testfile);
+    console.log(chalk.underline(chalk.gray(testfileRel)));
+
     await compileSetupFiles(setupFiles);
 
     for (const beforeAllCb of suite.beforeAllCbs ?? []) {
       await beforeAllCb();
     }
-
-    const testfileRel = path.relative(PROJECT_ROOT, testfile);
-    console.log(chalk.underline(chalk.gray(testfileRel)));
 
     const describes = suite.describes ?? [];
     for (const descObj of describes) {
