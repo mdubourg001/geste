@@ -12,6 +12,7 @@
   "scripts": {
     "build": "esbuild src/geste.ts --outfile=dist/geste.js --external:esbuild --loader:.ts=tsx --platform=node --target=node12 --format=cjs --banner:js=\"#!/usr/bin/env node\" --bundle",
     "test": "pnpm build && cd examples/jest-replacement && pnpm geste",
+    "test:rtl": "pnpm build && cd examples/react-testing-library-examples && pnpm geste",
     "prepublish": "pnpm build"
   },
   "author": "",
