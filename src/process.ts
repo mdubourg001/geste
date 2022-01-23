@@ -9,6 +9,7 @@ import { IDescribe, ISummary, ITest, ILifecycleHookCb } from "./types";
 import { log } from "./log";
 import { bundleForNode } from "./bundle";
 import { getFormattedDuration, getPathWithoutExt } from "./utils";
+import { OutputFile } from "esbuild";
 
 export function walkTestFiles({
   testPatterns,
@@ -39,36 +40,16 @@ export function walkTestFiles({
   return files;
 }
 
-export async function compileTestFiles(testFiles: string[]) {
+export async function bundleTestFiles(testFiles: string[]) {
   process.stdout.write(" →  Compiling test files...");
   const start = performance.now();
 
   const bundle = await bundleForNode({ files: testFiles });
 
-  for (const file of bundle.outputFiles) {
-    const withoutExt = getPathWithoutExt(file.path);
-    const sourceFile = testFiles.find(
-      (f) => getPathWithoutExt(f) === withoutExt
-    );
-    global.__GESTE_CURRENT_TESTFILE = sourceFile;
-
-    const moduleSources = file.text;
-    const module = new Module(file.path);
-
-    try {
-      // @ts-ignore
-      module._compile(moduleSources, "");
-    } catch (e) {
-      throw new Error(
-        `Error while compiling ${path.relative(PROJECT_ROOT, sourceFile)}:\n${
-          e.stack
-        };`
-      );
-    }
-  }
-
   const duration = getFormattedDuration(performance.now() - start);
   process.stdout.write(`\r →  Compiled test files. ${chalk.gray(duration)}\n`);
+
+  return bundle.outputFiles;
 }
 
 export async function compileSetupFiles(setupFiles: string[]) {
@@ -95,7 +76,15 @@ export async function compileSetupFiles(setupFiles: string[]) {
   }
 }
 
-export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
+export async function unrollTests({
+  testFiles,
+  bundledTestFiles,
+  setupFiles,
+}: {
+  testFiles: string[];
+  bundledTestFiles: OutputFile[];
+  setupFiles: string[];
+}): Promise<ISummary> {
   process.stdout.write(" →  Running tests...\n\n");
 
   const summary = {
@@ -106,34 +95,86 @@ export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
     duration: 0,
   };
 
-  const entries = Object.entries(global.__GESTE_TESTS) as Array<
-    [
-      string,
-      {
-        describes: IDescribe[];
-        tests: ITest[];
-        beforeAllCbs: ILifecycleHookCb[];
-        afterAllCbs: ILifecycleHookCb[];
-        beforeEachCbs: ILifecycleHookCb[];
-        afterEachCbs: ILifecycleHookCb[];
-      }
-    ]
-  >;
-
   const start = performance.now();
-  for (const [testfile, suite] of entries) {
-    const testfileRel = path.relative(PROJECT_ROOT, testfile);
-    console.log(chalk.underline(chalk.gray(testfileRel)));
-
+  for (const testFile of bundledTestFiles) {
     await compileSetupFiles(setupFiles);
 
-    for (const beforeAllCb of suite.beforeAllCbs ?? []) {
-      await beforeAllCb();
+    const withoutExt = getPathWithoutExt(testFile.path);
+    const sourceFile = testFiles.find(
+      (f) => getPathWithoutExt(f) === withoutExt
+    );
+    global.__GESTE_CURRENT_TESTFILE = sourceFile;
+
+    const moduleSources = testFile.text;
+    const module = new Module(testFile.path);
+
+    try {
+      // @ts-ignore
+      module._compile(moduleSources, "");
+    } catch (e) {
+      throw new Error(
+        `Error while compiling ${path.relative(PROJECT_ROOT, sourceFile)}:\n${
+          e.stack
+        };`
+      );
     }
 
-    const describes = suite.describes ?? [];
-    for (const descObj of describes) {
-      for (const testObj of descObj.tests) {
+    // TODO: simplify
+    const entries = Object.entries(global.__GESTE_TESTS) as Array<
+      [
+        string,
+        {
+          describes: IDescribe[];
+          tests: ITest[];
+          beforeAllCbs: ILifecycleHookCb[];
+          afterAllCbs: ILifecycleHookCb[];
+          beforeEachCbs: ILifecycleHookCb[];
+          afterEachCbs: ILifecycleHookCb[];
+        }
+      ]
+    >;
+
+    for (const [testfile, suite] of entries) {
+      const testfileRel = path.relative(PROJECT_ROOT, testfile);
+      console.log(chalk.underline(chalk.gray(testfileRel)));
+
+      for (const beforeAllCb of suite.beforeAllCbs ?? []) {
+        await beforeAllCb();
+      }
+
+      const describes = suite.describes ?? [];
+      for (const descObj of describes) {
+        for (const testObj of descObj.tests) {
+          summary.total++;
+
+          for (const beforeEachCb of suite.beforeEachCbs ?? []) {
+            await beforeEachCb();
+          }
+
+          try {
+            await testObj.cb();
+            log.success(`${descObj.desc}: ${testObj.desc}`);
+
+            summary.succeeded++;
+          } catch (e) {
+            process.exitCode = 1;
+            summary.failed++;
+            summary.failedList.push(
+              `${descObj.desc}: ${testObj.desc} ${chalk.gray(testfileRel)}`
+            );
+
+            log.fail(`${descObj.desc}: ${testObj.desc}`);
+            log.error(e);
+          }
+
+          for (const afterEachCb of suite.afterEachCbs ?? []) {
+            await afterEachCb();
+          }
+        }
+      }
+
+      const tests = suite.tests ?? [];
+      for (const testObj of tests) {
         summary.total++;
 
         for (const beforeEachCb of suite.beforeEachCbs ?? []) {
@@ -142,17 +183,14 @@ export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
 
         try {
           await testObj.cb();
-          log.success(`${descObj.desc}: ${testObj.desc}`);
-
+          log.success(testObj.desc);
           summary.succeeded++;
         } catch (e) {
           process.exitCode = 1;
           summary.failed++;
-          summary.failedList.push(
-            `${descObj.desc}: ${testObj.desc} ${chalk.gray(testfileRel)}`
-          );
+          summary.failedList.push(`${testObj.desc} ${chalk.gray(testfileRel)}`);
 
-          log.fail(`${descObj.desc}: ${testObj.desc}`);
+          log.fail(testObj.desc);
           log.error(e);
         }
 
@@ -160,40 +198,17 @@ export async function unrollTests(setupFiles: string[]): Promise<ISummary> {
           await afterEachCb();
         }
       }
-    }
 
-    const tests = suite.tests ?? [];
-    for (const testObj of tests) {
-      summary.total++;
-
-      for (const beforeEachCb of suite.beforeEachCbs ?? []) {
-        await beforeEachCb();
+      for (const afterAllCb of suite.afterAllCbs ?? []) {
+        await afterAllCb();
       }
 
-      try {
-        await testObj.cb();
-        log.success(testObj.desc);
-        summary.succeeded++;
-      } catch (e) {
-        process.exitCode = 1;
-        summary.failed++;
-        summary.failedList.push(`${testObj.desc} ${chalk.gray(testfileRel)}`);
+      global.__GESTE_TESTS = {};
 
-        log.fail(testObj.desc);
-        log.error(e);
-      }
-
-      for (const afterEachCb of suite.afterEachCbs ?? []) {
-        await afterEachCb();
-      }
+      console.log("\n");
     }
-
-    for (const afterAllCb of suite.afterAllCbs ?? []) {
-      await afterAllCb();
-    }
-
-    console.log("\n");
   }
+
   summary.duration = performance.now() - start;
 
   return summary;

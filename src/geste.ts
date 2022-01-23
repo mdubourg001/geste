@@ -2,7 +2,7 @@ import expect from "expect";
 
 import { getConfig } from "./config";
 import { log, summarize } from "./log";
-import { walkTestFiles, compileTestFiles, unrollTests } from "./process";
+import { walkTestFiles, unrollTests, bundleTestFiles } from "./process";
 import { parseCmdlineArgs } from "./args";
 import { CWD, PROJECT_ROOT } from "./constants";
 import {
@@ -41,8 +41,12 @@ async function main() {
     cwd: parsedArgv.testPatterns.length ? CWD : PROJECT_ROOT,
   });
 
-  await compileTestFiles(testFiles);
-  const summary = await unrollTests(config.setupFiles);
+  const bundledTestFiles = await bundleTestFiles(testFiles);
+  const summary = await unrollTests({
+    testFiles,
+    bundledTestFiles,
+    setupFiles: config.setupFiles,
+  });
 
   summarize(summary);
 }

@@ -1,4 +1,4 @@
-import { build, BuildOptions } from "esbuild";
+import { build, BuildOptions, BuildResult } from "esbuild";
 
 const BUNDLE_CACHE = {};
 
@@ -66,7 +66,7 @@ export async function bundleForNode({
   files: string[];
   memoize?: boolean;
   buildOptions?: BuildOptions;
-}) {
+}): Promise<BuildResult> {
   const filesHash = arrayHash(files);
 
   if (BUNDLE_CACHE[filesHash]) {
