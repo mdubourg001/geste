@@ -29,6 +29,8 @@ global.afterAll = afterAll;
 global.beforeEach = beforeEach;
 global.afterEach = afterEach;
 
+// TODO: fix global typings
+// TODO: handle test's `timeout` (thirst argument of jest's test)
 // TODO: https://jestjs.io/docs/mock-function-api#mockfnmockclear
 // TODO: spyOn
 async function main() {

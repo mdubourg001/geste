@@ -10,12 +10,14 @@ export interface IGesteConfig {
 export interface ITest {
   desc: string;
   cb: () => any | Promise<any>;
+  skip?: boolean;
 }
 
 export interface IDescribe {
   desc: string;
   cb: () => any | Promise<any>;
   tests: ITest[];
+  skip?: boolean;
 }
 
 export type ILifecycleHookCb = () => any | Promise<any>;

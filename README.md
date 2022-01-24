@@ -28,8 +28,10 @@ npm install --save-dev geste-test
 **geste's API aims to be the exact same as Jest's:**
 
 - [`describe`](https://jestjs.io/docs/api#describename-fn)
+- [`describe.skip`](https://jestjs.io/docs/api#describeskipname-fn)
 - [`test`](https://jestjs.io/docs/api#testname-fn-timeout)
 - [`test.each`](https://jestjs.io/docs/api#testeachtablename-fn-timeout)
+- [`test.skip`](https://jestjs.io/docs/api#testskipname-fn)
 - [`it`](https://jestjs.io/docs/api#testname-fn-timeout)
 - [`beforeAll`](https://jestjs.io/docs/api#beforeallfn-timeout)
 - [`afterAll`](https://jestjs.io/docs/api#afterallfn-timeout)

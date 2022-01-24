@@ -2,27 +2,37 @@ import util from "util";
 
 import { IDescribe, ITest } from "./types";
 
-export async function describe(desc: string, cb: () => any | Promise<any>) {
-  const describeObj = { desc, cb, tests: [] } as IDescribe;
+function registerDescribe(descObj: IDescribe) {
   const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
 
   if (currentTestfile?.describes) {
-    currentTestfile.describes.push(describeObj);
+    currentTestfile.describes.push(descObj);
   } else if (currentTestfile) {
-    currentTestfile.describes = [describeObj];
+    currentTestfile.describes = [descObj];
   } else {
     global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
-      describes: [describeObj],
+      describes: [descObj],
     };
   }
 
   global.__GESTE_IN_DESCRIBE = true;
-  cb();
+  descObj.cb();
   global.__GESTE_IN_DESCRIBE = false;
 }
 
-export async function test(desc: string, cb: () => any | Promise<any>) {
-  const testObj = { desc, cb } as ITest;
+export async function describe(desc: string, cb: () => any | Promise<any>) {
+  const describeObj: IDescribe = { desc, cb, tests: [] };
+
+  registerDescribe(describeObj);
+}
+
+describe.skip = function (desc: string, cb: () => any | Promise<any>) {
+  const describeObj: IDescribe = { desc, cb, tests: [], skip: true };
+
+  registerTest(describeObj);
+};
+
+function registerTest(testObj: ITest) {
   const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
 
   if (currentTestfile) {
@@ -53,6 +63,12 @@ export async function test(desc: string, cb: () => any | Promise<any>) {
   }
 }
 
+export async function test(desc: string, cb: () => any | Promise<any>) {
+  const testObj: ITest = { desc, cb };
+
+  registerTest(testObj);
+}
+
 test.each = function (cases: any[]) {
   return async (desc: string, cb: (...args: any[]) => any | Promise<any>) => {
     for (const eachCase of cases) {
@@ -61,6 +77,12 @@ test.each = function (cases: any[]) {
       test(formattedDesc, () => cb(...eachCase));
     }
   };
+};
+
+test.skip = function (desc: string, cb: () => any | Promise<any>) {
+  const testObj: ITest = { desc, cb, skip: true };
+
+  registerTest(testObj);
 };
 
 export async function beforeAll(cb: () => any | Promise<any>) {

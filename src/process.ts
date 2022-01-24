@@ -145,6 +145,12 @@ export async function unrollTests({
       const describes = suite.describes ?? [];
       for (const descObj of describes) {
         for (const testObj of descObj.tests) {
+          if (descObj.skip || testObj.skip) {
+            log.skip(`${descObj.desc}: ${testObj.desc}`);
+
+            continue;
+          }
+
           summary.total++;
 
           for (const beforeEachCb of suite.beforeEachCbs ?? []) {
@@ -175,6 +181,12 @@ export async function unrollTests({
 
       const tests = suite.tests ?? [];
       for (const testObj of tests) {
+        if (testObj.skip) {
+          log.skip(testObj.desc);
+
+          continue;
+        }
+
         summary.total++;
 
         for (const beforeEachCb of suite.beforeEachCbs ?? []) {

@@ -22,6 +22,9 @@ export const log = {
   fail: function (message: string) {
     console.log(chalk.red(" ✘ "), message);
   },
+  skip: function (message: string) {
+    console.log(chalk.strikethrough(chalk.gray(" s ")), chalk.gray(message));
+  },
 };
 
 export function summarize(summary: ISummary) {
