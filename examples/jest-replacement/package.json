@@ -17,6 +17,7 @@
     "react-dom": "^17.0.2"
   },
   "devDependencies": {
-    "@happy-dom/global-registrator": "^2.28.0"
+    "@happy-dom/global-registrator": "^2.28.0",
+    "@testing-library/jest-dom": "^5.16.1"
   }
 }

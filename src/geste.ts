@@ -5,6 +5,7 @@ import { log, summarize } from "./log";
 import { walkTestFiles, unrollTests, bundleTestFiles } from "./process";
 import { parseCmdlineArgs } from "./args";
 import { CWD, PROJECT_ROOT } from "./constants";
+import { jestCompat } from "./jest-compat";
 import {
   describe,
   test,
@@ -18,6 +19,7 @@ global.__GESTE_CURRENT_TESTFILE;
 global.__GESTE_IN_DESCRIBE = false;
 global.__GESTE_TESTS = {};
 
+global.jest = jestCompat;
 global.describe = describe;
 global.test = test;
 global.it = test;
@@ -27,7 +29,8 @@ global.afterAll = afterAll;
 global.beforeEach = beforeEach;
 global.afterEach = afterEach;
 
-// TODO: mock
+// TODO: https://jestjs.io/docs/mock-function-api#mockfnmockclear
+// TODO: spyOn
 async function main() {
   const parsedArgv = parseCmdlineArgs(process.argv);
   const config = await getConfig();

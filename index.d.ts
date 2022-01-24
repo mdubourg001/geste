@@ -10,3 +10,6 @@ declare var afterAll: (cb: () => any | Promise<any>) => void;
 declare var beforeEach: (cb: () => any | Promise<any>) => void;
 declare var afterEach: (cb: () => any | Promise<any>) => void;
 declare var expect: typeof import("expect");
+declare var jest: {
+  fn: (impl?: (...args: any[]) => any) => any;
+};
