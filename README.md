@@ -35,6 +35,7 @@ npm install --save-dev geste-test
 - [`afterAll`](https://jestjs.io/docs/api#afterallfn-timeout)
 - [`beforeEach`](https://jestjs.io/docs/api#beforeeachfn-timeout)
 - [`afterEach`](https://jestjs.io/docs/api#aftereachfn-timeout)
+- [`jest.fn`](https://jestjs.io/docs/jest-object#jestfnimplementation)
 
 However this is a WIP project so more APIs will be implemented in the future. Feel free to **fill in an issue** to ask for the APIs you'd like to be implemented in priority.
 
@@ -57,7 +58,9 @@ geste tests/utils/*.ts
 Install jsdom and global-jsdom:
 
 ```bash
-npm install --save-dev jsdom global-jsdom
+npm install --save-dev linkedom
+# optional: for usage with testing-library
+npm install --save-dev @testing-library/jest-dom
 ```
 
 Create a `geste.config.ts` file at the root of your project (next to `package.json`):
