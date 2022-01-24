@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="shots/geste.png" alt="geste" height="60" />
+  <img src="shots/geste-2-es.png" alt="geste" height="200" />
 </div>
 
 <br>
@@ -55,7 +55,7 @@ geste tests/utils/*.ts
 
 ### Usage with tests needing a DOM
 
-Install jsdom and global-jsdom:
+Install `linkedom` and (optionally) `@testing-library/jest-dom`:
 
 ```bash
 npm install --save-dev linkedom
