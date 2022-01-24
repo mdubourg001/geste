@@ -18,6 +18,7 @@ import {
 global.__GESTE_CURRENT_TESTFILE;
 global.__GESTE_IN_DESCRIBE = false;
 global.__GESTE_TESTS = {};
+global.__GESTE_MOCKS = [];
 
 global.jest = jestCompat;
 global.describe = describe;
@@ -29,10 +30,11 @@ global.afterAll = afterAll;
 global.beforeEach = beforeEach;
 global.afterEach = afterEach;
 
-// TODO: fix global typings
-// TODO: handle test's `timeout` (thirst argument of jest's test)
-// TODO: https://jestjs.io/docs/mock-function-api#mockfnmockclear
+// TODO: config.globals
+// TODO: test's callback `done` https://jestjs.io/docs/asynchronous#callbacks
 // TODO: spyOn
+// TODO: fix global typings
+// TODO: handle test's `timeout` (third argument of jest's test)
 async function main() {
   const parsedArgv = parseCmdlineArgs(process.argv);
   const config = await getConfig();
