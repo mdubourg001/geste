@@ -151,6 +151,7 @@ export async function unrollTests({
             continue;
           }
 
+          global.__GESTE_CURRENT_TESTNAME = `${descObj.desc}: ${testObj.desc}`;
           summary.total++;
 
           for (const beforeEachCb of suite.beforeEachCbs ?? []) {
@@ -159,17 +160,17 @@ export async function unrollTests({
 
           try {
             await testObj.cb();
-            log.success(`${descObj.desc}: ${testObj.desc}`);
 
+            log.success(global.__GESTE_CURRENT_TESTNAME);
             summary.succeeded++;
           } catch (e) {
             process.exitCode = 1;
             summary.failed++;
             summary.failedList.push(
-              `${descObj.desc}: ${testObj.desc} ${chalk.gray(testfileRel)}`
+              `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(testfileRel)}`
             );
 
-            log.fail(`${descObj.desc}: ${testObj.desc}`);
+            log.fail(global.__GESTE_CURRENT_TESTNAME);
             log.error(e);
           }
 
@@ -187,6 +188,7 @@ export async function unrollTests({
           continue;
         }
 
+        global.__GESTE_CURRENT_TESTNAME = testObj.desc;
         summary.total++;
 
         for (const beforeEachCb of suite.beforeEachCbs ?? []) {
@@ -195,14 +197,18 @@ export async function unrollTests({
 
         try {
           await testObj.cb();
-          log.success(testObj.desc);
+
+          log.success(global.__GESTE_CURRENT_TESTNAME);
+          global.__GESTE_FS_SNAPSHOTS_COUNT_FOR_TESTNAME = 0;
           summary.succeeded++;
         } catch (e) {
           process.exitCode = 1;
           summary.failed++;
-          summary.failedList.push(`${testObj.desc} ${chalk.gray(testfileRel)}`);
+          summary.failedList.push(
+            `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(testfileRel)}`
+          );
 
-          log.fail(testObj.desc);
+          log.fail(global.__GESTE_CURRENT_TESTNAME);
           log.error(e);
         }
 

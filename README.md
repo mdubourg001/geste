@@ -38,6 +38,7 @@ npm install --save-dev geste-test
 - [`beforeEach`](https://jestjs.io/docs/api#beforeeachfn-timeout)
 - [`afterEach`](https://jestjs.io/docs/api#aftereachfn-timeout)
 - [`jest.fn`](https://jestjs.io/docs/jest-object#jestfnimplementation)
+- [`jest.resetAllMocks`](https://jestjs.io/docs/jest-object#jestresetallmocks)
 
 However this is a WIP project so more APIs will be implemented in the future. Feel free to **fill in an issue** to ask for the APIs you'd like to be implemented in priority.
 

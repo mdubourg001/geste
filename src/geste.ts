@@ -1,10 +1,9 @@
-import expect from "expect";
-
 import { getConfig } from "./config";
 import { log, summarize } from "./log";
 import { walkTestFiles, unrollTests, bundleTestFiles } from "./process";
 import { parseCmdlineArgs } from "./args";
 import { CWD, PROJECT_ROOT } from "./constants";
+import { expect } from "./expect";
 import { jestCompat } from "./jest-compat";
 import {
   describe,
@@ -15,7 +14,8 @@ import {
   afterEach,
 } from "./test";
 
-global.__GESTE_CURRENT_TESTFILE;
+global.__GESTE_CURRENT_TESTFILE = undefined;
+global.__GESTE_CURRENT_TESTNAME = undefined;
 global.__GESTE_IN_DESCRIBE = false;
 global.__GESTE_TESTS = {};
 global.__GESTE_MOCKS = [];

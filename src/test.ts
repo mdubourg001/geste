@@ -20,7 +20,7 @@ function registerDescribe(descObj: IDescribe) {
   global.__GESTE_IN_DESCRIBE = false;
 }
 
-export async function describe(desc: string, cb: () => any | Promise<any>) {
+export function describe(desc: string, cb: () => any | Promise<any>) {
   const describeObj: IDescribe = { desc, cb, tests: [] };
 
   registerDescribe(describeObj);
@@ -63,7 +63,7 @@ function registerTest(testObj: ITest) {
   }
 }
 
-export async function test(desc: string, cb: () => any | Promise<any>) {
+export function test(desc: string, cb: () => any | Promise<any>) {
   const testObj: ITest = { desc, cb };
 
   registerTest(testObj);
@@ -85,7 +85,7 @@ test.skip = function (desc: string, cb: () => any | Promise<any>) {
   registerTest(testObj);
 };
 
-export async function beforeAll(cb: () => any | Promise<any>) {
+export function beforeAll(cb: () => any | Promise<any>) {
   const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
 
   if (currentTestfile?.beforeAllCbs) {
@@ -99,7 +99,7 @@ export async function beforeAll(cb: () => any | Promise<any>) {
   }
 }
 
-export async function afterAll(cb: () => any | Promise<any>) {
+export function afterAll(cb: () => any | Promise<any>) {
   const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
 
   if (currentTestfile?.afterAllCbs) {
@@ -113,7 +113,7 @@ export async function afterAll(cb: () => any | Promise<any>) {
   }
 }
 
-export async function beforeEach(cb: () => any | Promise<any>) {
+export function beforeEach(cb: () => any | Promise<any>) {
   const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
 
   if (currentTestfile?.beforeEachCbs) {
@@ -127,7 +127,7 @@ export async function beforeEach(cb: () => any | Promise<any>) {
   }
 }
 
-export async function afterEach(cb: () => any | Promise<any>) {
+export function afterEach(cb: () => any | Promise<any>) {
   const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
 
   if (currentTestfile?.afterEachCbs) {
