@@ -1,6 +1,6 @@
 {
   "name": "geste-test",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "description": "",
   "bin": {
     "geste": "./dist/geste.js"
