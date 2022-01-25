@@ -17,6 +17,7 @@ const DEFAULT_CONFIG: IGesteConfig = {
   ],
   ignorePatterns: ["**/node_modules/**/*"],
   setupFiles: [],
+  throwOnCompilationErrors: true,
 };
 
 export async function getConfig(): Promise<IGesteConfig> {

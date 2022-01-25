@@ -174,6 +174,7 @@ export default {
   ],
   ignorePatterns: ["**/node_modules/**/*"],
   setupFiles: [],
+  throwOnCompilationErrors: true,
 };
 ```
 
@@ -182,3 +183,4 @@ Here are the list of the currently supported configuration options, and their Je
 - `testPatterns`: array of [glob](https://github.com/isaacs/node-glob) patterns used to walk your project's sources and find test files. Equivalent to [Jest's `testMatch`](https://jestjs.io/docs/configuration#testmatch-arraystring)
 - `ignorePatterns`: array of [glob](https://github.com/isaacs/node-glob) patterns that will be ignored when looking for test files. Close to [Jest's `testPathIgnorePatterns`](https://jestjs.io/docs/configuration#testpathignorepatterns-arraystring) but here **it's a array of glob patterns instead of regexp patterns**.
 - `setupFiles`: array of paths to modules that will be compiled and evaluated before every one of your test files. Equivalent to [Jest's `setupFiles`](https://jestjs.io/docs/configuration#setupfiles-array)
+- `throwOnCompilationErrors`: should geste throw if it encounters an error while compiling a test file. Kinda same as setting [Jest's `bail`](https://jestjs.io/docs/configuration#bail-number--boolean) to `true`

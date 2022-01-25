@@ -80,10 +80,12 @@ export async function unrollTests({
   testFiles,
   bundledTestFiles,
   setupFiles,
+  throwOnCompilationError,
 }: {
   testFiles: string[];
   bundledTestFiles: OutputFile[];
   setupFiles: string[];
+  throwOnCompilationError: boolean;
 }): Promise<ISummary> {
   process.stdout.write(" →  Running tests...\n\n");
 
@@ -97,6 +99,7 @@ export async function unrollTests({
 
   const start = performance.now();
   for (const testFile of bundledTestFiles) {
+    const testfileRel = path.relative(PROJECT_ROOT, testFile.path);
     await compileSetupFiles(setupFiles);
 
     const withoutExt = getPathWithoutExt(testFile.path);
@@ -112,30 +115,39 @@ export async function unrollTests({
       // @ts-ignore
       module._compile(moduleSources, "");
     } catch (e) {
-      throw new Error(
-        `Error while compiling ${path.relative(PROJECT_ROOT, sourceFile)}:\n${
-          e.stack
-        };`
-      );
+      console.log(chalk.underline(chalk.gray(testfileRel)));
+      global.__GESTE_BAIL_COUNT++;
+
+      const formattedError = `Error while compiling ${path.relative(
+        PROJECT_ROOT,
+        sourceFile
+      )}:\n${e.stack};`;
+
+      if (throwOnCompilationError) {
+        throw new Error(formattedError);
+      } else {
+        process.exitCode = 1;
+        summary.total++;
+        summary.failed++;
+        summary.failedList.push(
+          `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(testfileRel)}`
+        );
+
+        log.error(formattedError);
+        console.log("\n");
+      }
     }
 
-    // TODO: simplify
-    const entries = Object.entries(global.__GESTE_TESTS) as Array<
-      [
-        string,
-        {
-          describes: IDescribe[];
-          tests: ITest[];
-          beforeAllCbs: ILifecycleHookCb[];
-          afterAllCbs: ILifecycleHookCb[];
-          beforeEachCbs: ILifecycleHookCb[];
-          afterEachCbs: ILifecycleHookCb[];
-        }
-      ]
-    >;
+    const suites = Object.values(global.__GESTE_TESTS) as {
+      describes: IDescribe[];
+      tests: ITest[];
+      beforeAllCbs: ILifecycleHookCb[];
+      afterAllCbs: ILifecycleHookCb[];
+      beforeEachCbs: ILifecycleHookCb[];
+      afterEachCbs: ILifecycleHookCb[];
+    }[];
 
-    for (const [testfile, suite] of entries) {
-      const testfileRel = path.relative(PROJECT_ROOT, testfile);
+    for (const suite of suites) {
       console.log(chalk.underline(chalk.gray(testfileRel)));
 
       for (const beforeAllCb of suite.beforeAllCbs ?? []) {

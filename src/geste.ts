@@ -34,9 +34,10 @@ global.afterAll = afterAll;
 global.beforeEach = beforeEach;
 global.afterEach = afterEach;
 
-// TODO: config.globals
+// TODO: Multilple snapshots in same testfile / unit test
 // TODO: test's callback `done` https://jestjs.io/docs/asynchronous#callbacks
 // TODO: spyOn
+// TODO: config.globals
 // TODO: fix global typings
 // TODO: handle test's `timeout` (third argument of jest's test)
 async function main() {
@@ -57,6 +58,7 @@ async function main() {
     testFiles,
     bundledTestFiles,
     setupFiles: config.setupFiles,
+    throwOnCompilationError: config.throwOnCompilationErrors,
   });
 
   summarize(summary);

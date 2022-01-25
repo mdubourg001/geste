@@ -5,6 +5,8 @@ export interface IGesteConfig {
   ignorePatterns: string[];
   // the list of files to run before running each tests
   setupFiles: string[];
+  // should geste throw on compilation errors
+  throwOnCompilationErrors: boolean;
 }
 
 export interface ITest {
