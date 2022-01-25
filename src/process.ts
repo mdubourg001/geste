@@ -100,6 +100,8 @@ export async function unrollTests({
   const start = performance.now();
   for (const testFile of bundledTestFiles) {
     const testfileRel = path.relative(PROJECT_ROOT, testFile.path);
+    console.log(chalk.underline(chalk.gray(testfileRel)));
+
     await compileSetupFiles(setupFiles);
 
     const withoutExt = getPathWithoutExt(testFile.path);
@@ -115,7 +117,6 @@ export async function unrollTests({
       // @ts-ignore
       module._compile(moduleSources, "");
     } catch (e) {
-      console.log(chalk.underline(chalk.gray(testfileRel)));
       global.__GESTE_BAIL_COUNT++;
 
       const formattedError = `Error while compiling ${path.relative(
@@ -129,78 +130,35 @@ export async function unrollTests({
         process.exitCode = 1;
         summary.total++;
         summary.failed++;
-        summary.failedList.push(
-          `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(testfileRel)}`
-        );
+        summary.failedList.push(testfileRel);
 
         log.error(formattedError);
-        console.log("\n");
       }
     }
 
-    const suites = Object.values(global.__GESTE_TESTS) as {
+    const suite = global.__GESTE_TESTS as {
       describes: IDescribe[];
       tests: ITest[];
       beforeAllCbs: ILifecycleHookCb[];
       afterAllCbs: ILifecycleHookCb[];
       beforeEachCbs: ILifecycleHookCb[];
       afterEachCbs: ILifecycleHookCb[];
-    }[];
+    };
 
-    for (const suite of suites) {
-      console.log(chalk.underline(chalk.gray(testfileRel)));
+    for (const beforeAllCb of suite.beforeAllCbs ?? []) {
+      await beforeAllCb();
+    }
 
-      for (const beforeAllCb of suite.beforeAllCbs ?? []) {
-        await beforeAllCb();
-      }
-
-      const describes = suite.describes ?? [];
-      for (const descObj of describes) {
-        for (const testObj of descObj.tests) {
-          if (descObj.skip || testObj.skip) {
-            log.skip(`${descObj.desc}: ${testObj.desc}`);
-
-            continue;
-          }
-
-          global.__GESTE_CURRENT_TESTNAME = `${descObj.desc}: ${testObj.desc}`;
-          summary.total++;
-
-          for (const beforeEachCb of suite.beforeEachCbs ?? []) {
-            await beforeEachCb();
-          }
-
-          try {
-            await testObj.cb();
-
-            log.success(global.__GESTE_CURRENT_TESTNAME);
-            summary.succeeded++;
-          } catch (e) {
-            process.exitCode = 1;
-            summary.failed++;
-            summary.failedList.push(
-              `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(testfileRel)}`
-            );
-
-            log.fail(global.__GESTE_CURRENT_TESTNAME);
-            log.error(e);
-          }
-
-          for (const afterEachCb of suite.afterEachCbs ?? []) {
-            await afterEachCb();
-          }
-        }
-      }
-
-      const tests = suite.tests ?? [];
-      for (const testObj of tests) {
-        if (testObj.skip) {
-          log.skip(testObj.desc);
+    const describes = suite.describes ?? [];
+    for (const descObj of describes) {
+      for (const testObj of descObj.tests) {
+        if (descObj.skip || testObj.skip) {
+          log.skip(`${descObj.desc}: ${testObj.desc}`);
 
           continue;
         }
 
-        global.__GESTE_CURRENT_TESTNAME = testObj.desc;
+        global.__GESTE_CURRENT_TESTNAME = `${descObj.desc}: ${testObj.desc}`;
         summary.total++;
 
         for (const beforeEachCb of suite.beforeEachCbs ?? []) {
@@ -211,7 +169,6 @@ export async function unrollTests({
           await testObj.cb();
 
           log.success(global.__GESTE_CURRENT_TESTNAME);
-          global.__GESTE_FS_SNAPSHOTS_COUNT_FOR_TESTNAME = 0;
           summary.succeeded++;
         } catch (e) {
           process.exitCode = 1;
@@ -228,15 +185,52 @@ export async function unrollTests({
           await afterEachCb();
         }
       }
+    }
 
-      for (const afterAllCb of suite.afterAllCbs ?? []) {
-        await afterAllCb();
+    const tests = suite.tests ?? [];
+    for (const testObj of tests) {
+      if (testObj.skip) {
+        log.skip(testObj.desc);
+
+        continue;
       }
 
-      global.__GESTE_TESTS = {};
+      global.__GESTE_CURRENT_TESTNAME = testObj.desc;
+      summary.total++;
 
-      console.log("\n");
+      for (const beforeEachCb of suite.beforeEachCbs ?? []) {
+        await beforeEachCb();
+      }
+
+      try {
+        await testObj.cb();
+
+        log.success(global.__GESTE_CURRENT_TESTNAME);
+        global.__GESTE_FS_SNAPSHOTS_COUNT_FOR_TESTNAME = 0;
+        summary.succeeded++;
+      } catch (e) {
+        process.exitCode = 1;
+        summary.failed++;
+        summary.failedList.push(
+          `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(testfileRel)}`
+        );
+
+        log.fail(global.__GESTE_CURRENT_TESTNAME);
+        log.error(e);
+      }
+
+      for (const afterEachCb of suite.afterEachCbs ?? []) {
+        await afterEachCb();
+      }
     }
+
+    for (const afterAllCb of suite.afterAllCbs ?? []) {
+      await afterAllCb();
+    }
+
+    global.__GESTE_TESTS = {};
+
+    console.log("\n");
   }
 
   summary.duration = performance.now() - start;

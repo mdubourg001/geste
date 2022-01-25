@@ -3,16 +3,10 @@ import util from "util";
 import { IDescribe, ITest } from "./types";
 
 function registerDescribe(descObj: IDescribe) {
-  const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
-
-  if (currentTestfile?.describes) {
-    currentTestfile.describes.push(descObj);
-  } else if (currentTestfile) {
-    currentTestfile.describes = [descObj];
+  if (global.__GESTE_TESTS?.describes) {
+    global.__GESTE_TESTS.describes.push(descObj);
   } else {
-    global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
-      describes: [descObj],
-    };
+    global.__GESTE_TESTS.describes = [descObj];
   }
 
   global.__GESTE_IN_DESCRIBE = true;
@@ -33,33 +27,27 @@ describe.skip = function (desc: string, cb: () => any | Promise<any>) {
 };
 
 function registerTest(testObj: ITest) {
-  const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
+  if (global.__GESTE_IN_DESCRIBE) {
+    const descObj =
+      global.__GESTE_TESTS.describes[global.__GESTE_TESTS.describes.length - 1];
 
-  if (currentTestfile) {
-    if (global.__GESTE_IN_DESCRIBE) {
-      const descObj =
-        currentTestfile.describes[currentTestfile.describes.length - 1];
-
-      if (descObj?.tests) {
-        descObj.tests.push(testObj);
-      } else if (descObj) {
-        descObj.tests = [testObj];
-      } else {
-        currentTestfile.describes[currentTestfile.describes.length - 1] = {
-          tests: [testObj],
-        };
-      }
+    if (descObj?.tests) {
+      descObj.tests.push(testObj);
+    } else if (descObj) {
+      descObj.tests = [testObj];
     } else {
-      if (currentTestfile.tests) {
-        currentTestfile.tests.push(testObj);
-      } else {
-        currentTestfile.tests = [testObj];
-      }
+      global.__GESTE_TESTS.describes[
+        global.__GESTE_TESTS.describes.length - 1
+      ] = {
+        tests: [testObj],
+      };
     }
   } else {
-    global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
-      tests: [testObj],
-    };
+    if (global.__GESTE_TESTS.tests) {
+      global.__GESTE_TESTS.tests.push(testObj);
+    } else {
+      global.__GESTE_TESTS.tests = [testObj];
+    }
   }
 }
 
@@ -86,57 +74,33 @@ test.skip = function (desc: string, cb: () => any | Promise<any>) {
 };
 
 export function beforeAll(cb: () => any | Promise<any>) {
-  const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
-
-  if (currentTestfile?.beforeAllCbs) {
-    currentTestfile.beforeAllCbs.push(cb);
-  } else if (currentTestfile) {
-    currentTestfile.beforeAllCbs = [cb];
+  if (global.__GESTE_TESTS?.beforeAllCbs) {
+    global.__GESTE_TESTS.beforeAllCbs.push(cb);
   } else {
-    global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
-      beforeAllCbs: [cb],
-    };
+    global.__GESTE_TESTS.beforeAllCbs = [cb];
   }
 }
 
 export function afterAll(cb: () => any | Promise<any>) {
-  const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
-
-  if (currentTestfile?.afterAllCbs) {
-    currentTestfile.afterAllCbs.push(cb);
-  } else if (currentTestfile) {
-    currentTestfile.afterAllCbs = [cb];
+  if (global.__GESTE_TESTS?.afterAllCbs) {
+    global.__GESTE_TESTS.afterAllCbs.push(cb);
   } else {
-    global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
-      afterAllCbs: [cb],
-    };
+    global.__GESTE_TESTS.afterAllCbs = [cb];
   }
 }
 
 export function beforeEach(cb: () => any | Promise<any>) {
-  const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
-
-  if (currentTestfile?.beforeEachCbs) {
-    currentTestfile.beforeEachCbs.push(cb);
-  } else if (currentTestfile) {
-    currentTestfile.beforeEachCbs = [cb];
+  if (global.__GESTE_TESTS?.beforeEachCbs) {
+    global.__GESTE_TESTS.beforeEachCbs.push(cb);
   } else {
-    global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
-      beforeEachCbs: [cb],
-    };
+    global.__GESTE_TESTS.beforeEachCbs = [cb];
   }
 }
 
 export function afterEach(cb: () => any | Promise<any>) {
-  const currentTestfile = global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE];
-
-  if (currentTestfile?.afterEachCbs) {
-    currentTestfile.afterEachCbs.push(cb);
-  } else if (currentTestfile) {
-    currentTestfile.afterEachCbs = [cb];
+  if (global.__GESTE_TESTS?.afterEachCbs) {
+    global.__GESTE_TESTS.afterEachCbs.push(cb);
   } else {
-    global.__GESTE_TESTS[global.__GESTE_CURRENT_TESTFILE] = {
-      afterEachCbs: [cb],
-    };
+    global.__GESTE_TESTS.afterEachCbs = [cb];
   }
 }
