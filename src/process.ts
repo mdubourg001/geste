@@ -133,6 +133,7 @@ export async function unrollTests({
         summary.failedList.push(testfileRel);
 
         log.error(formattedError);
+        continue;
       }
     }
 
@@ -146,7 +147,17 @@ export async function unrollTests({
     };
 
     for (const beforeAllCb of suite.beforeAllCbs ?? []) {
-      await beforeAllCb();
+      try {
+        await beforeAllCb();
+      } catch (e) {
+        process.exitCode = 1;
+        summary.total++;
+        summary.failed++;
+        summary.failedList.push(testfileRel);
+
+        log.error(e);
+        continue;
+      }
     }
 
     const describes = suite.describes ?? [];
@@ -161,12 +172,16 @@ export async function unrollTests({
         global.__GESTE_CURRENT_TESTNAME = `${descObj.desc}: ${testObj.desc}`;
         summary.total++;
 
-        for (const beforeEachCb of suite.beforeEachCbs ?? []) {
-          await beforeEachCb();
-        }
-
         try {
+          for (const beforeEachCb of suite.beforeEachCbs ?? []) {
+            await beforeEachCb();
+          }
+
           await testObj.cb();
+
+          for (const afterEachCb of suite.afterEachCbs ?? []) {
+            await afterEachCb();
+          }
 
           log.success(global.__GESTE_CURRENT_TESTNAME);
           summary.succeeded++;
@@ -179,10 +194,6 @@ export async function unrollTests({
 
           log.fail(global.__GESTE_CURRENT_TESTNAME);
           log.error(e);
-        }
-
-        for (const afterEachCb of suite.afterEachCbs ?? []) {
-          await afterEachCb();
         }
       }
     }
@@ -198,12 +209,16 @@ export async function unrollTests({
       global.__GESTE_CURRENT_TESTNAME = testObj.desc;
       summary.total++;
 
-      for (const beforeEachCb of suite.beforeEachCbs ?? []) {
-        await beforeEachCb();
-      }
-
       try {
+        for (const beforeEachCb of suite.beforeEachCbs ?? []) {
+          await beforeEachCb();
+        }
+
         await testObj.cb();
+
+        for (const afterEachCb of suite.afterEachCbs ?? []) {
+          await afterEachCb();
+        }
 
         log.success(global.__GESTE_CURRENT_TESTNAME);
         global.__GESTE_FS_SNAPSHOTS_COUNT_FOR_TESTNAME = 0;
@@ -218,14 +233,19 @@ export async function unrollTests({
         log.fail(global.__GESTE_CURRENT_TESTNAME);
         log.error(e);
       }
-
-      for (const afterEachCb of suite.afterEachCbs ?? []) {
-        await afterEachCb();
-      }
     }
 
     for (const afterAllCb of suite.afterAllCbs ?? []) {
-      await afterAllCb();
+      try {
+        await afterAllCb();
+      } catch (e) {
+        process.exitCode = 1;
+        summary.total++;
+        summary.failed++;
+        summary.failedList.push(testfileRel);
+
+        log.error(e);
+      }
     }
 
     global.__GESTE_TESTS = {};
