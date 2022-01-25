@@ -99,16 +99,15 @@ export async function unrollTests({
 
   const start = performance.now();
   for (const testFile of bundledTestFiles) {
-    const testfileRel = path.relative(PROJECT_ROOT, testFile.path);
-    console.log(chalk.underline(chalk.gray(testfileRel)));
-
-    await compileSetupFiles(setupFiles);
-
     const withoutExt = getPathWithoutExt(testFile.path);
     const sourceFile = testFiles.find(
       (f) => getPathWithoutExt(f) === withoutExt
     );
+    const sourceFileRel = path.relative(PROJECT_ROOT, sourceFile);
     global.__GESTE_CURRENT_TESTFILE = sourceFile;
+
+    console.log(chalk.underline(chalk.gray(sourceFileRel)));
+    await compileSetupFiles(setupFiles);
 
     const moduleSources = testFile.text;
     const module = new Module(testFile.path);
@@ -119,10 +118,7 @@ export async function unrollTests({
     } catch (e) {
       global.__GESTE_BAIL_COUNT++;
 
-      const formattedError = `Error while compiling ${path.relative(
-        PROJECT_ROOT,
-        sourceFile
-      )}:\n${e.stack};`;
+      const formattedError = `Error while compiling ${sourceFileRel}:\n${e.stack};`;
 
       if (throwOnCompilationError) {
         throw new Error(formattedError);
@@ -130,7 +126,7 @@ export async function unrollTests({
         process.exitCode = 1;
         summary.total++;
         summary.failed++;
-        summary.failedList.push(testfileRel);
+        summary.failedList.push(sourceFileRel);
 
         log.error(formattedError);
         continue;
@@ -153,7 +149,7 @@ export async function unrollTests({
         process.exitCode = 1;
         summary.total++;
         summary.failed++;
-        summary.failedList.push(testfileRel);
+        summary.failedList.push(sourceFileRel);
 
         log.error(e);
         continue;
@@ -189,7 +185,7 @@ export async function unrollTests({
           process.exitCode = 1;
           summary.failed++;
           summary.failedList.push(
-            `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(testfileRel)}`
+            `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(sourceFileRel)}`
           );
 
           log.fail(global.__GESTE_CURRENT_TESTNAME);
@@ -227,7 +223,7 @@ export async function unrollTests({
         process.exitCode = 1;
         summary.failed++;
         summary.failedList.push(
-          `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(testfileRel)}`
+          `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(sourceFileRel)}`
         );
 
         log.fail(global.__GESTE_CURRENT_TESTNAME);
@@ -242,7 +238,7 @@ export async function unrollTests({
         process.exitCode = 1;
         summary.total++;
         summary.failed++;
-        summary.failedList.push(testfileRel);
+        summary.failedList.push(sourceFileRel);
 
         log.error(e);
       }
