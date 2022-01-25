@@ -19,6 +19,10 @@ global.__GESTE_CURRENT_TESTNAME = undefined;
 global.__GESTE_IN_DESCRIBE = false;
 global.__GESTE_TESTS = {};
 global.__GESTE_MOCKS = [];
+global.__GESTE_SNAPSHOTS_SUMMARY = {
+  written: [],
+  updated: [],
+};
 
 global.jest = jestCompat;
 global.describe = describe;
@@ -36,7 +40,7 @@ global.afterEach = afterEach;
 // TODO: fix global typings
 // TODO: handle test's `timeout` (third argument of jest's test)
 async function main() {
-  const parsedArgv = parseCmdlineArgs(process.argv);
+  const parsedArgv = parseCmdlineArgs();
   const config = await getConfig();
 
   const testFiles = walkTestFiles({

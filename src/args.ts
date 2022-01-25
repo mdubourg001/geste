@@ -1,5 +1,13 @@
-export function parseCmdlineArgs(argv: string[]) {
-  const parsed = { options: {}, testPatterns: [] };
+import { IParsedArgv } from "./types";
+
+let PARSED_ARGV: IParsedArgv | undefined;
+
+export function parseCmdlineArgs(argv: string[] = process.argv): IParsedArgv {
+  if (PARSED_ARGV) {
+    return PARSED_ARGV;
+  }
+
+  PARSED_ARGV = { options: {}, testPatterns: [] };
   const optionals = argv.slice(2);
 
   for (const token of optionals) {
@@ -7,12 +15,12 @@ export function parseCmdlineArgs(argv: string[]) {
       const asParam = new URLSearchParams(token);
 
       for (const key of asParam.keys()) {
-        parsed.options[key] = asParam.get(key) || true;
+        PARSED_ARGV.options[key] = asParam.get(key) || true;
       }
     } else {
-      parsed.testPatterns.push(token);
+      PARSED_ARGV.testPatterns.push(token);
     }
   }
 
-  return parsed;
+  return PARSED_ARGV;
 }

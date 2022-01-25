@@ -56,6 +56,10 @@ To run only specific tests:
 geste tests/utils/*.ts
 ```
 
+### Available options
+
+- `--update-snapshots`: when set, failing `expect.toMatchSnapshot()` assertions will update corresponding snapshot files.
+
 ### Usage with tests needing a DOM
 
 Install `linkedom` and (optionally) `@testing-library/jest-dom`:

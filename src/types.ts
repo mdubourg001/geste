@@ -29,3 +29,8 @@ export interface ISummary {
   failedList: string[];
   duration: number;
 }
+
+export interface IParsedArgv {
+  options: Record<string, string | boolean>;
+  testPatterns: string[];
+}
