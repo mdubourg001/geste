@@ -1,6 +1,6 @@
 import chalk from "chalk";
 
-import { ISummary } from "./types";
+import { ISummary, IBenchmarkResults } from "./types";
 import { getFormattedDuration } from "./utils";
 
 export const log = {
@@ -31,30 +31,49 @@ export const log = {
   skip: function (message: string) {
     console.log(chalk.strikethrough(chalk.gray(" s ")), chalk.gray(message));
   },
+  benchmark: function (message, { N, nsPerOp, benchtime }: IBenchmarkResults) {
+    console.log(
+      chalk.magenta(" b "),
+      `${message}     ${N}     ${nsPerOp.toFixed(
+        0
+      )}ns/op     ${benchtime.toFixed(0)}ms`
+    );
+  },
 };
 
 export function summarize(summary: ISummary) {
   const colorPassed = summary.succeeded ? chalk.green : (s) => s;
   const colorFailed = summary.failed ? chalk.red : (s) => s;
+  const colorBench = summary.benchmarksTotal ? chalk.magenta : (s) => s;
+
+  const showBenchmarks = summary.benchmarksTotal > 0;
 
   const snapshots = global.__GESTE_SNAPSHOTS_SUMMARY;
-  const showSnapshots = snapshots.updated.length || snapshots.written.length;
+  const showSnapshots =
+    snapshots?.updated?.length || snapshots?.written?.length;
 
   console.log(
-    `Total:       ${summary.total}
-Duration:    ${getFormattedDuration(summary.duration)}
-${colorPassed(`Passed:      ${summary.succeeded}`)}
-${colorFailed(`Failed:      ${summary.failed}`)}
+    `Total:        ${summary.total}
+Duration:     ${getFormattedDuration(summary.duration)}
+${colorPassed(`Passed:       ${summary.succeeded}`)}
+${colorFailed(`Failed:       ${summary.failed}`)}
+${
+  showBenchmarks
+    ? colorBench(
+        `Benchmarks:   ${getFormattedDuration(summary.benchmarksDuration)}`
+      )
+    : ""
+}
 ${
   showSnapshots
     ? chalk.blue(
-        `Snapshots:   ${snapshots.written.length} written, ${snapshots.updated.length} updated\n`
+        `Snapshots:    ${snapshots?.written?.length} written, ${snapshots?.updated?.length} updated\n`
       )
     : ""
 }`
   );
 
-  if (summary.failedList.length) {
+  if (summary.failedList?.length) {
     summary.failedList.forEach(log.fail);
   }
 
@@ -63,7 +82,7 @@ ${
     snapshots.updated.forEach(log.updated);
   }
 
-  if (summary.failedList.length || showSnapshots) {
+  if (summary.failedList?.length || showSnapshots) {
     console.log("\n");
   }
 }

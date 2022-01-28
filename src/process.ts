@@ -5,7 +5,14 @@ import Module from "module";
 import { performance } from "perf_hooks";
 
 import { PROJECT_ROOT } from "./constants";
-import { IDescribe, ISummary, ITest, ILifecycleHookCb } from "./types";
+import {
+  IDescribe,
+  ISummary,
+  ITest,
+  ILifecycleHookCb,
+  IBenchmark,
+  IBenchmarkResults,
+} from "./types";
 import { log } from "./log";
 import { bundleForNode } from "./bundle";
 import { getFormattedDuration, getPathWithoutExt } from "./utils";
@@ -81,13 +88,17 @@ export async function unrollTests({
   bundledTestFiles,
   setupFiles,
   throwOnCompilationError,
+  compileOnly,
 }: {
   testFiles: string[];
   bundledTestFiles: OutputFile[];
   setupFiles: string[];
   throwOnCompilationError: boolean;
+  compileOnly?: boolean;
 }): Promise<ISummary> {
-  process.stdout.write(" →  Running tests...\n\n");
+  if (!compileOnly) {
+    process.stdout.write(" →  Running tests...\n\n");
+  }
 
   const summary = {
     total: 0,
@@ -106,7 +117,9 @@ export async function unrollTests({
     const sourceFileRel = path.relative(PROJECT_ROOT, sourceFile);
     global.__GESTE_CURRENT_TESTFILE = sourceFile;
 
-    console.log(chalk.underline(chalk.gray(sourceFileRel)));
+    if (!compileOnly) {
+      console.log(chalk.underline(chalk.gray(sourceFileRel)));
+    }
     await compileSetupFiles(setupFiles);
 
     const moduleSources = testFile.text;
@@ -131,6 +144,10 @@ export async function unrollTests({
         log.error(formattedError);
         continue;
       }
+    }
+
+    if (compileOnly) {
+      continue;
     }
 
     const suite = global.__GESTE_TESTS as {
@@ -250,6 +267,78 @@ export async function unrollTests({
   }
 
   summary.duration = performance.now() - start;
+
+  return summary;
+}
+
+async function runBenchmark(
+  benchmarkObj: IBenchmark
+): Promise<IBenchmarkResults> {
+  let N = 0.5;
+  let benchtime;
+
+  do {
+    N = N * 2 >= 10 ? N * 2 : Math.ceil(N / 10) * 10;
+
+    let start = performance.now();
+    const resetTimer = () => (start = performance.now());
+
+    await benchmarkObj.cb({ N, resetTimer });
+
+    benchtime = performance.now() - start;
+    // console.log({ benchtime });
+  } while (benchtime < 1_000);
+
+  return {
+    N,
+    benchtime,
+    nsPerOp: (benchtime * 1_000_000) / N,
+  };
+}
+
+export async function unrollBenchmarks() {
+  process.stdout.write(" →  Running benchmarks...\n\n");
+
+  const summary: ISummary = {
+    benchmarksTotal: 0,
+    benchmarksSucceeded: 0,
+    benchmarksFailed: 0,
+    benchmarksFailedList: [],
+    benchmarksDuration: 0,
+  };
+
+  const entries = Object.entries(global.__GESTE_BENCHMARKS) as [
+    string,
+    IBenchmark[]
+  ][];
+
+  const start = performance.now();
+  for (const [file, benchmarks] of entries) {
+    const fileRel = path.relative(PROJECT_ROOT, file);
+
+    console.log(chalk.underline(chalk.gray(fileRel)));
+
+    for (const benchmark of benchmarks) {
+      summary.benchmarksTotal++;
+
+      try {
+        const results = await runBenchmark(benchmark);
+
+        log.benchmark(benchmark.desc, results);
+        summary.benchmarksSucceeded++;
+      } catch (e) {
+        process.exitCode = 1;
+        summary.benchmarksFailed++;
+        summary.benchmarksFailedList.push(fileRel);
+
+        log.error(e);
+      }
+    }
+
+    summary.benchmarksDuration = performance.now() - start;
+
+    console.log("\n");
+  }
 
   return summary;
 }

@@ -22,14 +22,35 @@ export interface IDescribe {
   skip?: boolean;
 }
 
+export interface IBenchmark {
+  desc: string;
+  cb: (b: BenchmarkTools) => any | Promise<any>;
+}
+
+export interface BenchmarkTools {
+  N: number;
+  resetTimer: () => void;
+}
+
+export interface IBenchmarkResults {
+  N: number;
+  benchtime: number;
+  nsPerOp: number;
+}
+
 export type ILifecycleHookCb = () => any | Promise<any>;
 
 export interface ISummary {
-  total: number;
-  succeeded: number;
-  failed: number;
-  failedList: string[];
-  duration: number;
+  total?: number;
+  succeeded?: number;
+  failed?: number;
+  failedList?: string[];
+  duration?: number;
+  benchmarksTotal?: number;
+  benchmarksSucceeded?: number;
+  benchmarksFailed?: number;
+  benchmarksFailedList?: string[];
+  benchmarksDuration?: number;
 }
 
 export interface IParsedArgv {
