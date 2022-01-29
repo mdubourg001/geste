@@ -18,3 +18,12 @@ export function benchmark(
 
   registerBenchmark(benchmarkObj);
 }
+
+benchmark.skip = function (
+  desc: string,
+  cb: (b: BenchmarkTools) => any | Promise<any>
+) {
+  const benchmarkObj: IBenchmark = { desc, cb, skip: true };
+
+  registerBenchmark(benchmarkObj);
+};

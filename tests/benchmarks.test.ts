@@ -3,3 +3,7 @@ benchmark("benchmark sleep", async (b) => {
     await new Promise((r) => setTimeout(r, 100));
   }
 });
+
+benchmark.skip("skipped benchmark", (b) => {
+  throw "I should not run !";
+});

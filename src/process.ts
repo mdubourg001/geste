@@ -319,6 +319,12 @@ export async function unrollBenchmarks() {
     console.log(chalk.underline(chalk.gray(fileRel)));
 
     for (const benchmark of benchmarks) {
+      if (benchmark.skip) {
+        log.skip(benchmark.desc);
+
+        continue;
+      }
+
       summary.benchmarksTotal++;
 
       try {

@@ -28,8 +28,8 @@ function inneficientSquare(n: number) {
   return total;
 }
 
-benchmark("benchmark inneficientSquare", async (b) => {
+benchmark("benchmark inneficientSquare", (b) => {
   for (let i = 0; i < b.N; i++) {
-    await inneficientSquare(8000);
+    inneficientSquare(8000);
   }
 });

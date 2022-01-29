@@ -25,6 +25,7 @@ export interface IDescribe {
 export interface IBenchmark {
   desc: string;
   cb: (b: BenchmarkTools) => any | Promise<any>;
+  skip?: boolean;
 }
 
 export interface BenchmarkTools {
