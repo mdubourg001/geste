@@ -15,6 +15,9 @@ interface BenchmarkTools {
 }
 
 declare var describe: ((desc: string, cb: () => any | Promise<any>) => void) & {
+  each: (
+    cases: any[]
+  ) => (desc: string, cb: (...args: any[]) => any | Promise<any>) => void;
   skip: (desc: string, cb: () => any | Promise<any>) => void;
 };
 declare var test: ((desc: string, cb: () => any | Promise<any>) => void) & {

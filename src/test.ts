@@ -26,6 +26,16 @@ describe.skip = function (desc: string, cb: () => any | Promise<any>) {
   registerTest(describeObj);
 };
 
+describe.each = function (cases: any[]) {
+  return async (desc: string, cb: (...args: any[]) => any | Promise<any>) => {
+    for (const eachCase of cases) {
+      const formattedDesc = util.format(desc, ...eachCase);
+
+      describe(formattedDesc, () => cb(...eachCase));
+    }
+  };
+};
+
 function registerTest(testObj: ITest) {
   if (global.__GESTE_IN_DESCRIBE) {
     const descObj =

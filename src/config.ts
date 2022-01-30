@@ -2,7 +2,7 @@ import { existsSync } from "fs";
 import { build } from "esbuild";
 import Module from "module";
 
-import { IGesteConfig } from "./types";
+import { GesteConfig } from "./types";
 import {
   CONFIG_FILE_ABS,
   CONFIG_FILE_REL,
@@ -10,7 +10,7 @@ import {
 } from "./constants";
 
 let CONFIG;
-const DEFAULT_CONFIG: IGesteConfig = {
+const DEFAULT_CONFIG: GesteConfig = {
   testPatterns: [
     "**/__tests__/**/*.[jt]s?(x)",
     "**/?(*.)+(spec|test).[jt]s?(x)",
@@ -20,7 +20,7 @@ const DEFAULT_CONFIG: IGesteConfig = {
   throwOnCompilationErrors: true,
 };
 
-export async function getConfig(): Promise<IGesteConfig> {
+export async function getConfig(): Promise<GesteConfig> {
   if (CONFIG) {
     return CONFIG;
   } else if (!existsSync(CONFIG_FILE_ABS)) {

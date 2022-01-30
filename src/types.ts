@@ -1,4 +1,4 @@
-export interface IGesteConfig {
+export interface GesteConfig {
   // an array of glob patterns used to find test files in the project
   testPatterns: string[];
   // an array of glob patterns ignored while looking for test files

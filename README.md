@@ -16,31 +16,13 @@
 - Supa-fast compilation of test files
 - Support of async tests
 - Support of both ESM and CJS syntaxes
+- Built-in support of benchmark tests
 
 ## Installation
 
 ```bash
 npm install --save-dev geste-test
 ```
-
-## API
-
-**geste's API aims to be the exact same as Jest's:**
-
-- [`describe`](https://jestjs.io/docs/api#describename-fn)
-- [`describe.skip`](https://jestjs.io/docs/api#describeskipname-fn)
-- [`test`](https://jestjs.io/docs/api#testname-fn-timeout)
-- [`test.each`](https://jestjs.io/docs/api#testeachtablename-fn-timeout)
-- [`test.skip`](https://jestjs.io/docs/api#testskipname-fn)
-- [`it`](https://jestjs.io/docs/api#testname-fn-timeout)
-- [`beforeAll`](https://jestjs.io/docs/api#beforeallfn-timeout)
-- [`afterAll`](https://jestjs.io/docs/api#afterallfn-timeout)
-- [`beforeEach`](https://jestjs.io/docs/api#beforeeachfn-timeout)
-- [`afterEach`](https://jestjs.io/docs/api#aftereachfn-timeout)
-- [`jest.fn`](https://jestjs.io/docs/jest-object#jestfnimplementation)
-- [`jest.resetAllMocks`](https://jestjs.io/docs/jest-object#jestresetallmocks)
-
-However this is a WIP project so more APIs will be implemented in the future. Feel free to **fill in an issue** to ask for the APIs you'd like to be implemented in priority.
 
 ## Usage
 
@@ -59,6 +41,8 @@ geste tests/utils/*.ts
 ### Available options
 
 - `--update-snapshots`: when set, failing `expect.toMatchSnapshot()` assertions will update corresponding snapshot files.
+- `--bench`: run benchmark tests right after unit tests
+- `--only-bench`: run only benchmark tests and ignore unit tests
 
 ### Usage with tests needing a DOM
 
@@ -154,6 +138,58 @@ global.document = document;
 global.window = window;
 global.navigator = window.navigator;
 window.console = global.console;
+```
+
+## API
+
+**geste's API aims to be the exact same as Jest's:**
+
+- [`describe`](https://jestjs.io/docs/api#describename-fn)
+- [`describe.each`](https://jestjs.io/docs/api#describeeachtablename-fn-timeout)
+- [`describe.skip`](https://jestjs.io/docs/api#describeskipname-fn)
+- [`test`](https://jestjs.io/docs/api#testname-fn-timeout)
+- [`test.each`](https://jestjs.io/docs/api#testeachtablename-fn-timeout)
+- [`test.skip`](https://jestjs.io/docs/api#testskipname-fn)
+- [`it`](https://jestjs.io/docs/api#testname-fn-timeout)
+- [`beforeAll`](https://jestjs.io/docs/api#beforeallfn-timeout)
+- [`afterAll`](https://jestjs.io/docs/api#afterallfn-timeout)
+- [`beforeEach`](https://jestjs.io/docs/api#beforeeachfn-timeout)
+- [`afterEach`](https://jestjs.io/docs/api#aftereachfn-timeout)
+- [`jest.fn`](https://jestjs.io/docs/jest-object#jestfnimplementation)
+- [`jest.resetAllMocks`](https://jestjs.io/docs/jest-object#jestresetallmocks)
+
+However this is a WIP project so more APIs will be implemented in the future. Feel free to **fill in an issue** to ask for the APIs you'd like to be implemented in priority.
+
+### Benchmark API
+
+geste also implements a benchmarking API inspired by [Golang's](https://gobyexample.com/testing-and-benchmarking). Benchmark tests are written the same way as unit tests and are launched only when running geste with the `--bench` option (or `--only-bench` to run only benchmark tests).
+
+- `benchmark: (desc: string, cb: (b: BenchmarkTools) => any) => void`: register a benchmark test
+
+```typescript
+import { BenchmarkTools } from "geste-test";
+
+benchmark("benchmark factorialize", (b: BenchmarkTools) => {
+  for (let i = 0; i < b.N; i++) {
+    factorialize(10);
+  }
+});
+
+// `geste --bench` will output something like:
+// tests/benchmarks.test.ts
+// b  benchmark factorialize(10)     20971520     82ns/op     1714ms
+```
+
+- `benchmark.skip: (desc: string, cb: (b: BenchmarkTools) => any) => void`: skip a benchmark test
+
+- `benchmark.each: (cases: any[]) => (desc: string, cb: (b: BenchmarkTools, ...args: any[]) => any) => void`: register a benchmark test for each case provided. Useful to benchmark a function with various inputs.
+
+```typescript
+benchmark.each([[10], [100], [1000]])("benchmark factorialize(%i)", (b, n) => {
+  for (let i = 0; i < b.N; i++) {
+    factorialize(n);
+  }
+});
 ```
 
 ## Configuration

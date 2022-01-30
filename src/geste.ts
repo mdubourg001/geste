@@ -84,3 +84,5 @@ main().catch((error) => {
 
   process.exitCode = 1;
 });
+
+export { BenchmarkTools, GesteConfig } from "./types";
