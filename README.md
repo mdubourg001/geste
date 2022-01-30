@@ -164,7 +164,9 @@ However this is a WIP project so more APIs will be implemented in the future. Fe
 
 geste also implements a benchmarking API inspired by [Golang's](https://gobyexample.com/testing-and-benchmarking). Benchmark tests are written the same way as unit tests and are launched only when running geste with the `--bench` option (or `--only-bench` to run only benchmark tests).
 
-- `benchmark: (desc: string, cb: (b: BenchmarkTools) => any) => void`: register a benchmark test
+#### `benchmark: (desc: string, cb: (b: BenchmarkTools) => any) => void`:
+
+Register a benchmark test.
 
 ```typescript
 import { BenchmarkTools } from "geste-test";
@@ -174,15 +176,27 @@ benchmark("benchmark factorialize", (b: BenchmarkTools) => {
     factorialize(10);
   }
 });
-
-// `geste --bench` will output something like:
-// tests/benchmarks.test.ts
-// b  benchmark factorialize(10)     20971520     82ns/op     1714ms
 ```
 
-- `benchmark.skip: (desc: string, cb: (b: BenchmarkTools) => any) => void`: skip a benchmark test
+`geste --bench` will output something like:
 
-- `benchmark.each: (cases: any[]) => (desc: string, cb: (b: BenchmarkTools, ...args: any[]) => any) => void`: register a benchmark test for each case provided. Useful to benchmark a function with various inputs.
+```plaintext
+tests/benchmarks.test.ts
+b  benchmark factorialize     20971520     82ns/op     1714ms
+```
+
+- `benchmark factorialize` is the name of the benchmark test
+- `20971520` is the number of times your function was able to run in (at least) **one second** (higher is better)
+- `82ns/op` indicates **how much time each run took** in average (lower is better)
+- `1714ms` is the execution time that was needed to run your function `20971520` times
+
+#### `benchmark.skip: (desc: string, cb: (b: BenchmarkTools) => any) => void`
+
+Skip a benchmark test.
+
+#### `benchmark.each: (cases: any[]) => (desc: string, cb: (b: BenchmarkTools, ...args: any[]) => any) => void`
+
+Register a benchmark test for each case provided. Useful to benchmark a function with various inputs.
 
 ```typescript
 benchmark.each([[10], [100], [1000]])("benchmark factorialize(%i)", (b, n) => {
