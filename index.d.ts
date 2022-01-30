@@ -9,6 +9,11 @@ interface MockFunction extends Function {
   mockReset: () => void;
 }
 
+interface BenchmarkTools {
+  N: number;
+  resetTimer: () => void;
+}
+
 declare var describe: ((desc: string, cb: () => any | Promise<any>) => void) & {
   skip: (desc: string, cb: () => any | Promise<any>) => void;
 };
@@ -20,11 +25,17 @@ declare var test: ((desc: string, cb: () => any | Promise<any>) => void) & {
 };
 declare var benchmark: ((
   desc: string,
-  cb: (b: { N: number; resetTimer: () => void }) => any | Promise<any>
+  cb: (b: BenchmarkTools) => any | Promise<any>
 ) => void) & {
+  each: (
+    cases: any[]
+  ) => (
+    desc: string,
+    cb: (b: BenchmarkTools, ...args: any[]) => any | Promise<any>
+  ) => void;
   skip: (
     desc: string,
-    cb: (b: { N: number; resetTimer: () => void }) => any | Promise<any>
+    cb: (b: BenchmarkTools) => any | Promise<any>
   ) => any | Promise<any>;
 };
 declare var it: typeof test;

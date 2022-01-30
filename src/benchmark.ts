@@ -1,3 +1,5 @@
+import util from "util";
+
 import { IBenchmark, BenchmarkTools } from "./types";
 
 function registerBenchmark(benchmarkObj: IBenchmark) {
@@ -26,4 +28,17 @@ benchmark.skip = function (
   const benchmarkObj: IBenchmark = { desc, cb, skip: true };
 
   registerBenchmark(benchmarkObj);
+};
+
+benchmark.each = function (cases: any[]) {
+  return async (
+    desc: string,
+    cb: (b: BenchmarkTools, ...args: any[]) => any | Promise<any>
+  ) => {
+    for (const eachCase of cases) {
+      const formattedDesc = util.format(desc, ...eachCase);
+
+      benchmark(formattedDesc, (b) => cb(b, ...eachCase));
+    }
+  };
 };
