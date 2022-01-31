@@ -142,6 +142,8 @@ window.console = global.console;
 
 ## API
 
+### Test API
+
 **geste's API aims to be the exact same as Jest's:**
 
 - [`describe`](https://jestjs.io/docs/api#describename-fn)
@@ -159,6 +161,8 @@ window.console = global.console;
 - [`jest.resetAllMocks`](https://jestjs.io/docs/jest-object#jestresetallmocks)
 
 However this is a WIP project so more APIs will be implemented in the future. Feel free to **fill in an issue** to ask for the APIs you'd like to be implemented in priority.
+
+Check out the [`examples/`](/examples) folder to see real usages of geste API.
 
 ### Benchmark API
 
