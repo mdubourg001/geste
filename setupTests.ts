@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom/extend-expect";
+import "@testing-library/jest-dom";
 import { parseHTML } from "linkedom";
 
 const defaultHtml =
@@ -12,6 +12,11 @@ const { document } = window;
 if (!window.location) {
   // @ts-ignore
   window.location = { protocol: "http" };
+}
+
+if (!document.getSelection) {
+  // @ts-ignore
+  document.getSelection = () => ({});
 }
 
 // add missing window.getComputedStyled property

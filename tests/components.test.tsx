@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
-import { render, fireEvent } from "@testing-library/react";
+import { render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 const Counter = () => {
   const [count, setCount] = useState(42);
@@ -25,14 +26,15 @@ const Counter = () => {
   );
 };
 
-test("react-testing-library", () => {
+test("react-testing-library", async () => {
+  const user = userEvent.setup();
   const { getByTestId, getByText } = render(<Counter />);
 
   expect(getByTestId("count").innerHTML).toBe("42");
 
-  fireEvent.click(getByText("-"));
+  await user.click(getByText("-"));
   expect(getByTestId("count").innerHTML).toBe("41");
 
-  fireEvent.click(getByText("+"));
+  await user.click(getByText("+"));
   expect(getByTestId("count").innerHTML).toBe("42");
 });

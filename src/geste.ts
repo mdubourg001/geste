@@ -61,7 +61,7 @@ async function main() {
     // if testPatterns are given from command line, searching these patterns from cwd
     cwd: parsedArgv.testPatterns.length ? CWD : PROJECT_ROOT,
   });
-  const bundledTestFiles = await bundleTestFiles(testFiles);
+  const bundledTestFiles = (await bundleTestFiles(testFiles)) ?? [];
 
   const testsSummary = await unrollTests({
     testFiles,

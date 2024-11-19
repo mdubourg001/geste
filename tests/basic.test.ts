@@ -25,11 +25,11 @@ describe.each([
     expect(a + b).toBe(expected);
   });
 
-  test(`returned value not be greater than ${expected}`, () => {
+  test(`returned value should not be greater than ${expected}`, () => {
     expect(a + b).not.toBeGreaterThan(expected);
   });
 
-  test(`returned value not be less than ${expected}`, () => {
+  test(`returned value should not be less than ${expected}`, () => {
     expect(a + b).not.toBeLessThan(expected);
   });
 });

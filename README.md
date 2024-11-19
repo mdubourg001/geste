@@ -71,7 +71,7 @@ Then create the `setupTests.ts` file, which will be ran before **each one of you
 
 import { parseHTML } from "linkedom";
 // optional: for usage with testing-library (run `npm install @testing-library/jest-dom`)
-import "@testing-library/jest-dom/extend-expect";
+import "@testing-library/jest-dom";
 
 const defaultHtml =
   '<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>';
@@ -84,6 +84,12 @@ const { document } = window;
 if (!window.location) {
   // @ts-ignore
   window.location = { protocol: "http" };
+}
+
+// add missing document.getSelection property
+if (!document.getSelection) {
+  // @ts-ignore
+  document.getSelection = () => ({});
 }
 
 // add missing window.getComputedStyled property

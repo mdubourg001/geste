@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import path from "path";
-import glob from "glob";
+import { glob } from "glob";
 import Module from "module";
 import { performance } from "perf_hooks";
 
@@ -65,7 +65,7 @@ export async function compileSetupFiles(setupFiles: string[]) {
     memoize: true,
   });
 
-  for (const file of bundle.outputFiles) {
+  for (const file of bundle.outputFiles ?? []) {
     // hack to monkey patch https://github.com/evanw/esbuild/issues/1311
     const moduleSources = file.text;
     const module = new Module(file.path);
@@ -114,6 +114,11 @@ export async function unrollTests({
     const sourceFile = testFiles.find(
       (f) => getPathWithoutExt(f) === withoutExt
     );
+
+    if (!sourceFile) {
+      continue;
+    }
+
     const sourceFileRel = path.relative(PROJECT_ROOT, sourceFile);
     global.__GESTE_CURRENT_TESTFILE = sourceFile;
 
@@ -139,7 +144,7 @@ export async function unrollTests({
         process.exitCode = 1;
         summary.total++;
         summary.failed++;
-        summary.failedList.push(sourceFileRel);
+        summary.failedList.push(sourceFileRel as never);
 
         log.error(formattedError);
         continue;
@@ -166,7 +171,7 @@ export async function unrollTests({
         process.exitCode = 1;
         summary.total++;
         summary.failed++;
-        summary.failedList.push(sourceFileRel);
+        summary.failedList.push(sourceFileRel as never);
 
         log.error(e);
         continue;
@@ -202,7 +207,9 @@ export async function unrollTests({
           process.exitCode = 1;
           summary.failed++;
           summary.failedList.push(
-            `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(sourceFileRel)}`
+            `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(
+              sourceFileRel
+            )}` as never
           );
 
           log.fail(global.__GESTE_CURRENT_TESTNAME);
@@ -240,7 +247,9 @@ export async function unrollTests({
         process.exitCode = 1;
         summary.failed++;
         summary.failedList.push(
-          `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(sourceFileRel)}`
+          `${global.__GESTE_CURRENT_TESTNAME} ${chalk.gray(
+            sourceFileRel
+          )}` as never
         );
 
         log.fail(global.__GESTE_CURRENT_TESTNAME);
@@ -255,7 +264,7 @@ export async function unrollTests({
         process.exitCode = 1;
         summary.total++;
         summary.failed++;
-        summary.failedList.push(sourceFileRel);
+        summary.failedList.push(sourceFileRel as never);
 
         log.error(e);
       }
@@ -299,7 +308,7 @@ async function runBenchmark(
 export async function unrollBenchmarks() {
   process.stdout.write(" →  Running benchmarks...\n\n");
 
-  const summary: ISummary = {
+  const summary = {
     benchmarksTotal: 0,
     benchmarksSucceeded: 0,
     benchmarksFailed: 0,
@@ -335,7 +344,7 @@ export async function unrollBenchmarks() {
       } catch (e) {
         process.exitCode = 1;
         summary.benchmarksFailed++;
-        summary.benchmarksFailedList.push(fileRel);
+        summary.benchmarksFailedList.push(fileRel as never);
 
         log.error(e);
       }
